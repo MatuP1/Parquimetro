@@ -137,16 +137,18 @@ public class VentanaConsultas extends javax.swing.JInternalFrame
    {
       this.refrescarTabla();      
    }
-   
+   //crear jpasswordText para pedir la contraseña al conectar a la consulta
+   // ¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡
+   //¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡
    private void conectarBD()
    {
          try
          {
             String driver ="com.mysql.cj.jdbc.Driver";
         	String servidor = "localhost:3306";
-        	String baseDatos = "batallas"; 
-        	String usuario = "admin_batallas";
-        	String clave = "pwadmin";
+        	String baseDatos = "parquimetro"; 
+        	String usuario = "admin";
+        	String clave = "pwadmin"; //ver como hacer
             String uriConexion = "jdbc:mysql://" + servidor + "/" + 
         	                     baseDatos +"?serverTimezone=America/Argentina/Buenos_Aires";
    
