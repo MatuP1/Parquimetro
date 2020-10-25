@@ -28,14 +28,14 @@ import javax.swing.WindowConstants;
 public class VentanaPrincipal extends javax.swing.JFrame 
 {
 
-   private VentanaBarcos ventanaBarcos;
-   private VentanaConsultas ventanaConsultas;
+   //private VentanaBarcos ventanaBarcos;
+   private ConsultasAdmin ventanaConsultas;
    private JButton btnCerrar;
    private JLabel lblAcercaDe4;
    private JLabel lblAcercaDe3;
    private JLabel lblAcercaDe2;
    private JLabel lblAcercaDe1;
-   private VentanaAbmBatallas ventanaAbmBatallas;
+   //private VentanaAbmBatallas ventanaAbmBatallas;
    private JMenu mnuAcercaDe;
    private JDialog dlgAcercaDe;
 
@@ -68,18 +68,19 @@ public class VentanaPrincipal extends javax.swing.JFrame
 
       initGUI();
 
-      this.ventanaBarcos = new VentanaBarcos();
+    /**  this.ventanaBarcos = new VentanaBarcos();
       ventanaBarcos.setLocation(0, -12);
       this.ventanaBarcos.setVisible(false);
       this.jDesktopPane1.add(this.ventanaBarcos);
-      
-      this.ventanaConsultas = new VentanaConsultas();
+      */
+      this.ventanaConsultas = new ConsultasAdmin();
       this.ventanaConsultas.setVisible(false);
       this.jDesktopPane1.add(this.ventanaConsultas);
-
+/**
       this.ventanaAbmBatallas = new VentanaAbmBatallas();
       this.ventanaAbmBatallas.setVisible(false);
       this.jDesktopPane1.add(this.ventanaAbmBatallas);
+ */
    }
    
    private void initGUI() 

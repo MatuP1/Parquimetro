@@ -26,7 +26,7 @@ import quick.dbtable.*;
 
 
 @SuppressWarnings("serial")
-public class VentanaConsultas extends javax.swing.JInternalFrame 
+public class ConsultasAdmin extends javax.swing.JInternalFrame 
 {
    private JPanel pnlConsulta;
    private JTextArea txtConsulta;
@@ -37,7 +37,7 @@ public class VentanaConsultas extends javax.swing.JInternalFrame
 
    
    
-   public VentanaConsultas() 
+   public ConsultasAdmin() 
    {
       super();
       initGUI();
