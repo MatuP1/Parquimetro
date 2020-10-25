@@ -11,8 +11,8 @@ public class PrincipalWindow extends JFrame{
 	private static final long serialVersionUID = 1L;
 	protected static final int AnchoVentana = 800, AltoVentana = 800;
 	
-	//protected PanelAdmin panelAdmin;
-	//private PanelInspector panelInspector;
+	protected PanelAdmin panelAdmin;
+	private PanelInspector panelInspector;
 	private PanelInicial panelInicio;
 	protected JPanel panelPrincipal;
 
@@ -42,18 +42,23 @@ public class PrincipalWindow extends JFrame{
 		setBounds(0, 0, AnchoVentana, AltoVentana);
 		panelPrincipal = new JPanel();
 		panelPrincipal.setLayout(null);
-		setContentPane(panelPrincipal);
 
 		panelInicio = new PanelInicial(this);
-		panelPrincipal.add(panelInicio);
+		setContentPane(panelInicio);
+		
 
 	}
-
 	
-	public void cambiarPanel(JPanel actual, JPanel nuevo) {
-		panelPrincipal.remove(actual);
-		panelPrincipal.add(nuevo);
-		panelPrincipal.repaint();
+	public int getAncho() {
+		return AnchoVentana;
+	}
+	
+	public int getAlto() {
+		return AltoVentana;
+	}
+	
+	public void cambiarPaneles(JPanel nuevo) {
+		setContentPane(nuevo);
 	}
 	
 	
