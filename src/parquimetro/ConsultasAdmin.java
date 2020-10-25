@@ -8,6 +8,7 @@ import java.awt.event.ComponentAdapter;
 import java.awt.event.ComponentEvent;
 
 import java.sql.Types;
+import java.sql.Connection;
 //import java.sql.ResultSet;
 import java.sql.SQLException;
 
@@ -34,7 +35,7 @@ public class ConsultasAdmin extends javax.swing.JInternalFrame
    private JButton btnEjecutar;
    private DBTable tabla;    
    private JScrollPane scrConsulta;
-
+   private Logica log;
    
    
    public ConsultasAdmin() 
@@ -125,73 +126,24 @@ public class ConsultasAdmin extends javax.swing.JInternalFrame
 
    private void thisComponentShown(ComponentEvent evt) 
    {
-      this.conectarBD();
+      log = new Logica();
    }
    
    private void thisComponentHidden(ComponentEvent evt) 
    {
-      this.desconectarBD();
+      log.desconectar();
    }
 
    private void btnEjecutarActionPerformed(ActionEvent evt) 
    {
       this.refrescarTabla();      
    }
-   //crear jpasswordText para pedir la contraseña al conectar a la consulta
-   // ¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡
-   //¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡
-   private void conectarBD()
-   {
-         try
-         {
-            String driver ="com.mysql.cj.jdbc.Driver";
-        	String servidor = "localhost:3306";
-        	String baseDatos = "parquimetro"; 
-        	String usuario = "admin";
-        	String clave = "pwadmin"; //ver como hacer
-            String uriConexion = "jdbc:mysql://" + servidor + "/" + 
-        	                     baseDatos +"?serverTimezone=America/Argentina/Buenos_Aires";
-   
-       //establece una conexiï¿½n con la  B.D. "batallas"  usando directamante una tabla DBTable    
-            tabla.connectDatabase(driver, uriConexion, usuario, clave);
-           
-         }
-         catch (SQLException ex)
-         {
-            JOptionPane.showMessageDialog(this,
-                           "Se produjo un error al intentar conectarse a la base de datos.\n" 
-                            + ex.getMessage(),
-                            "Error",
-                            JOptionPane.ERROR_MESSAGE);
-            System.out.println("SQLException: " + ex.getMessage());
-            System.out.println("SQLState: " + ex.getSQLState());
-            System.out.println("VendorError: " + ex.getErrorCode());
-         }
-         catch (ClassNotFoundException e)
-         {
-            e.printStackTrace();
-         }
-      
-   }
-
-   private void desconectarBD()
-   {
-         try
-         {
-            tabla.close();            
-         }
-         catch (SQLException ex)
-         {
-            System.out.println("SQLException: " + ex.getMessage());
-            System.out.println("SQLState: " + ex.getSQLState());
-            System.out.println("VendorError: " + ex.getErrorCode());
-         }      
-   }
-
+  
    private void refrescarTabla()
    {
       try
-      {    
+      {  
+    	  
     	 // seteamos la consulta a partir de la cual se obtendrï¿½n los datos para llenar la tabla
     	 tabla.setSelectSql(this.txtConsulta.getText().trim());
 

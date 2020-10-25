@@ -7,13 +7,13 @@ import java.sql.Statement;
 public class Logica {
 	private String error = null;
 	private Connection cnx=null;
-	public Logica(String url) {
+	public Logica() {
 		if (this.cnx == null)
 	    {             
 	       try
 	       {  //se genera el string que define los datos de la conexion 
 	          String servidor = "localhost:3306";
-	          String baseDatos = "batallas";
+	          String baseDatos = "parquimetro";
 	          String usuario = "admin";
 	          String clave = "admin";
 	          String uri = "jdbc:mysql://" + servidor + "/" + baseDatos + 
@@ -64,4 +64,18 @@ public class Logica {
 		}
 		return accede;
 	}
+	 public void desconectar()
+	   {
+	         try
+	         {
+	            cnx.close();            
+	         }
+	         catch (SQLException ex)
+	         {
+	            System.out.println("SQLException: " + ex.getMessage());
+	            System.out.println("SQLState: " + ex.getSQLState());
+	            System.out.println("VendorError: " + ex.getErrorCode());
+	         }      
+	   }
+
 }
