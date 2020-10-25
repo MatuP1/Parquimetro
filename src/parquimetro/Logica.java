@@ -4,8 +4,6 @@ import java.sql.DriverManager;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
-
-import batallas.String;
 public class Logica {
 	private String error = null;
 	private Connection cnx=null;
