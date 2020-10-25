@@ -4,10 +4,6 @@ import java.awt.BorderLayout;
 import java.awt.GridBagLayout;
 import java.awt.GridBagConstraints;
 import java.awt.Insets;
-import com.jgoodies.forms.layout.FormLayout;
-import com.jgoodies.forms.layout.ColumnSpec;
-import com.jgoodies.forms.layout.RowSpec;
-import com.jgoodies.forms.layout.FormSpecs;
 @SuppressWarnings("serial")
 public class UnidadInspector extends javax.swing.JInternalFrame
 {
