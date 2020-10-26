@@ -5,8 +5,11 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 
 import javax.swing.JButton;
+import javax.swing.JFrame;
 import javax.swing.JLabel;
+import javax.swing.JOptionPane;
 import javax.swing.JPanel;
+import javax.swing.JPasswordField;
 import javax.swing.SwingConstants;
 
 public class PanelInicial extends JPanel {
@@ -18,6 +21,7 @@ public class PanelInicial extends JPanel {
 	
 	private PrincipalWindow vPrincipal;
 	private int Ancho,Alto;
+	private JPasswordField passwordField;
 	
 	public PanelInicial(PrincipalWindow v) {
 		vPrincipal = v;
@@ -25,44 +29,40 @@ public class PanelInicial extends JPanel {
 		Alto=v.getAlto();
 		
 		this.setLayout(new GridLayout(0, 1, 0, 0));
-		this.setBounds(0, 0, Ancho, Alto);
+		this.setBounds(0, 0, 928, 512);
 		
 		JLabel lblUsuario = new JLabel(lblUsuarioString);
 		lblUsuario.setHorizontalAlignment(SwingConstants.CENTER);
 		this.add(lblUsuario);
 		
-		OyenteBotones Listener = new OyenteBotones();
+		OyenteAdmin LAdmin = new OyenteAdmin();
 		
 		JButton btnAdmin = new JButton(btnAdminString);
-		btnAdmin.addActionListener(Listener);
-		btnAdmin.setActionCommand("Admin");
+		btnAdmin.addActionListener(LAdmin);		
 		this.add(btnAdmin);
 		
+		OyenteInspector LInspector = new OyenteInspector();
+		
 		JButton btnInspector = new JButton(btnInspectorString);
-		btnInspector.addActionListener(Listener);
-		btnInspector.setActionCommand("Inspector");
+		btnInspector.addActionListener(LInspector);
 		this.add(btnInspector);
 		
 	}
 	
 	
-	private class OyenteBotones implements ActionListener {
-		public void actionPerformed(ActionEvent e) {
-			String s = e.getActionCommand();
-			switch (s) {
-			case ("Admin"): {
-				
-				PanelAdmin pa = new PanelAdmin(vPrincipal);
-				vPrincipal.cambiarPaneles(pa);
+	private class OyenteAdmin implements ActionListener {
+		public void actionPerformed(ActionEvent e) {	
+				PanelIngresoAdmin pia = new PanelIngresoAdmin(vPrincipal);
+				vPrincipal.cambiarPaneles(pia);
 			}
-			case ("Inspector"): {
-				
+		}
+	
+	private class OyenteInspector implements ActionListener {
+		public void actionPerformed(ActionEvent e) {
 				PanelInspector pi = new PanelInspector(vPrincipal);
 				vPrincipal.cambiarPaneles(pi);
 			}
-			}
 		}
-	}
 	
 
 }

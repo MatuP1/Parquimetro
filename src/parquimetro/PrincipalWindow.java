@@ -15,6 +15,7 @@ public class PrincipalWindow extends JFrame{
 	private PanelInspector panelInspector;
 	private PanelInicial panelInicio;
 	protected JPanel panelPrincipal;
+	private Logica logica; 
 
 	/**
 	 * Launch the application.
@@ -42,6 +43,7 @@ public class PrincipalWindow extends JFrame{
 		setBounds(0, 0, AnchoVentana, AltoVentana);
 		panelPrincipal = new JPanel();
 		panelPrincipal.setLayout(null);
+		logica = new Logica();
 
 		panelInicio = new PanelInicial(this);
 		setContentPane(panelInicio);
@@ -55,6 +57,10 @@ public class PrincipalWindow extends JFrame{
 	
 	public int getAlto() {
 		return AltoVentana;
+	}
+	
+	public Logica getLogica() {
+		return logica;
 	}
 	
 	public void cambiarPaneles(JPanel nuevo) {
