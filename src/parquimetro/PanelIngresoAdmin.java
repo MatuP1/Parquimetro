@@ -19,7 +19,7 @@ public class PanelIngresoAdmin extends JPanel{
 	private PrincipalWindow vPrincipal;
 	private Logica logica;
 	private int Ancho,Alto;
-	private String password;
+	private String password,pass;
 	private JPasswordField passwordField;
 
 	
@@ -51,10 +51,12 @@ public class PanelIngresoAdmin extends JPanel{
 	
 	
 	private class OyentePass implements KeyListener{
-
 		@Override
 		public void keyPressed(KeyEvent e) {
-			if(e.getKeyCode() == KeyEvent.VK_ENTER && logica.checkAdmin(String.valueOf(passwordField.getPassword()))   ) {
+			pass = new String(passwordField.getPassword());
+			System.out.println("El pass es: " + pass);
+			if(e.getKeyCode() == KeyEvent.VK_ENTER && logica.checkAdmin(pass)) { //TENGO EL PROBLEMA DE QUE PASSWORD ES NULL
+				System.out.println("Checkadmin devolvio true");
 				PanelAdmin pa = new PanelAdmin(vPrincipal);
 				vPrincipal.cambiarPaneles(pa);
 			}

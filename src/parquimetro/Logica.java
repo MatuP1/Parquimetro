@@ -36,10 +36,11 @@ public class Logica {
 	public Connection getConnection() {
 		return cnx;
 	}
-	public Boolean checkAdmin(String pass) {
-		Boolean accede = false;
-		if (pass == "admin")
-			accede=true;
+	public boolean checkAdmin(String pass) {
+		boolean accede = false;
+		System.out.println("El pass pasado a logica es: "+pass);
+		if (pass.equals("admin"))
+			accede = true;
 		return accede;
 	}
 	public boolean checkInspector(String legajo, String pass) {
