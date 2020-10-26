@@ -59,8 +59,8 @@ public class PanelInicial extends JPanel {
 	
 	private class OyenteInspector implements ActionListener {
 		public void actionPerformed(ActionEvent e) {
-				PanelInspector pi = new PanelInspector(vPrincipal);
-				vPrincipal.cambiarPaneles(pi);
+				PanelIngresoInspector pii = new PanelIngresoInspector(vPrincipal);
+				vPrincipal.cambiarPaneles(pii);
 			}
 		}
 	

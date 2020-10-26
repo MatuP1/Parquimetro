@@ -46,6 +46,7 @@ public class Logica {
 	public boolean checkInspector(String legajo, String pass) {
 		boolean accede = false;
 		ResultSet insp = null;
+		System.out.println("El user pasado es "+legajo+"y el pass pasado a logica es "+pass);
 		try {
 			if(cnx.isValid(200)) {
 				insp = cnx.createStatement().executeQuery("select legajo,password from inspectores where legajo="+legajo+" and password=md5("+pass+");");

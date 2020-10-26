@@ -37,7 +37,7 @@ public class PanelIngresoAdmin extends JPanel{
 		panel.setBounds(0, 0, 200, 200);
 		
 		passwordField = new JPasswordField(30);
-		String password = new String(passwordField.getPassword());
+		//String password = new String(passwordField.getPassword());
 		passwordField.addKeyListener(LPass);
 		
 		JLabel labelIngreso = new JLabel("Ingrese su contraseña");
@@ -45,7 +45,7 @@ public class PanelIngresoAdmin extends JPanel{
 		panel.add(labelIngreso);
 		panel.add(passwordField);
 		
-		System.out.println("El pass es: " + password);
+		//System.out.println("El pass es: " + password);
 		this.add(panel);	
 	}
 	
