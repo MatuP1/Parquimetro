@@ -3,6 +3,7 @@ package parquimetro;
 import javax.swing.JPanel;
 import javax.swing.SwingUtilities;
 import javax.swing.JFrame;
+import javax.swing.JInternalFrame;
 
 
 public class PrincipalWindow extends JFrame{
@@ -65,6 +66,10 @@ public class PrincipalWindow extends JFrame{
 	
 	public void cambiarPaneles(JPanel nuevo) {
 		setContentPane(nuevo);
+	}
+	
+	public void cambiarFrame(JInternalFrame frame) {
+		this.setContentPane(frame);
 	}
 	
 	

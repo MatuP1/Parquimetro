@@ -70,7 +70,7 @@ public class PanelIngresoInspector extends JPanel {
 			
 			System.out.println("El user es: " + user);
 			System.out.println("El pass es: " + pass);
-			if(e.getKeyCode() == KeyEvent.VK_ENTER && logica.checkInspector(user,pass)) { //TENGO EL PROBLEMA DE QUE PASSWORD ES NULL
+			if(e.getKeyCode() == KeyEvent.VK_ENTER && logica.checkInspector(user,pass)) { 
 				System.out.println("CheckInspector devolvio true");
 				PanelInspector pi = new PanelInspector(vPrincipal);
 				vPrincipal.cambiarPaneles(pi);

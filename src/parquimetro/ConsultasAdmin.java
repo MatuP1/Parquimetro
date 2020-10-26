@@ -36,11 +36,13 @@ public class ConsultasAdmin extends javax.swing.JInternalFrame
    private DBTable tabla;    
    private JScrollPane scrConsulta;
    private Logica log;
+   private PrincipalWindow vPrincipal;
    
    
-   public ConsultasAdmin() 
+   public ConsultasAdmin(PrincipalWindow v) 
    {
       super();
+      vPrincipal = v;
       initGUI();
    }
    

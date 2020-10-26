@@ -26,5 +26,6 @@ public class PanelAdmin extends JPanel {
 		this.add(lbl);
 	}
 	
+	
 
 }
