@@ -72,5 +72,9 @@ public class PrincipalWindow extends JFrame{
 		this.setContentPane(frame);
 	}
 	
+	public void volverPanelInicial() {
+		this.setContentPane(panelInicio);
+	}
+	
 	
 }

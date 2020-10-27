@@ -23,7 +23,14 @@ import javax.swing.SwingUtilities;
 import javax.swing.WindowConstants;
 import javax.swing.border.BevelBorder;
 
-import quick.dbtable.*; 
+import quick.dbtable.*;
+import javax.swing.JList;
+import javax.swing.border.LineBorder;
+import java.awt.Color;
+import javax.swing.JLabel;
+import java.awt.Font;
+import javax.swing.SwingConstants;
+import javax.swing.JTable; 
 
 
 @SuppressWarnings("serial")
@@ -37,12 +44,16 @@ public class ConsultasAdmin extends javax.swing.JInternalFrame
    private JScrollPane scrConsulta;
    private Logica log;
    private PrincipalWindow vPrincipal;
+   private JPanel panel;
+   private JTable table;
+   private DBTable table_1;
    
    
    public ConsultasAdmin(PrincipalWindow v) 
    {
       super();
       vPrincipal = v;
+      log = vPrincipal.getLogica();
       initGUI();
    }
    
@@ -52,9 +63,7 @@ public class ConsultasAdmin extends javax.swing.JInternalFrame
          setPreferredSize(new Dimension(800, 600));
          this.setBounds(0, 0, 800, 600);
          setVisible(true);
-         BorderLayout thisLayout = new BorderLayout();
          this.setTitle("Consultas (Utilizando DBTable)");
-         getContentPane().setLayout(thisLayout);
          this.setClosable(true);
          this.setDefaultCloseOperation(WindowConstants.HIDE_ON_CLOSE);
          this.setMaximizable(true);
@@ -66,9 +75,11 @@ public class ConsultasAdmin extends javax.swing.JInternalFrame
                thisComponentShown(evt);
             }
          });
+         getContentPane().setLayout(null);
          {
             pnlConsulta = new JPanel();
-            getContentPane().add(pnlConsulta, BorderLayout.NORTH);
+            pnlConsulta.setBounds(0, 0, 784, 186);
+            getContentPane().add(pnlConsulta);
             {
                scrConsulta = new JScrollPane();
                pnlConsulta.add(scrConsulta);
@@ -78,11 +89,7 @@ public class ConsultasAdmin extends javax.swing.JInternalFrame
                   txtConsulta.setTabSize(3);
                   txtConsulta.setColumns(80);
                   txtConsulta.setBorder(BorderFactory.createEtchedBorder(BevelBorder.LOWERED));
-                  txtConsulta.setText("SELECT t.fecha, t.nombre_batalla, b.nombre_barco, b.id, b.capitan, r.resultado \n" +
-                                      "FROM batallas t, resultados r, barcos b \n" +
-                                      "WHERE t.nombre_batalla = r.nombre_batalla \n" +
-                                      "AND r.nombre_barco = b.nombre_barco \n" +
-                                      "ORDER BY t.fecha, t.nombre_batalla, b.nombre_barco");
+                  txtConsulta.setText("Ingrese su consulta a la base de datos");
                   txtConsulta.setFont(new java.awt.Font("Monospaced",0,12));
                   txtConsulta.setRows(10);
                }
@@ -110,16 +117,48 @@ public class ConsultasAdmin extends javax.swing.JInternalFrame
          }
          {
         	// crea la tabla  
-        	tabla = new DBTable();
+        	tabla = log.connectAdmin();
         	
         	// Agrega la tabla al frame (no necesita JScrollPane como Jtable)
-            getContentPane().add(tabla, BorderLayout.CENTER);           
-                      
+
+            tabla.setBounds(10, 336 , 754, 325);
+            getContentPane().add(tabla);           
+            {
+            	panel = new JPanel();
+            	panel.setBounds(0, 197, 774, 139);
+            	getContentPane().add(panel);
+            	panel.setLayout(null);
+            	           	
+            	JLabel lblTablas = new JLabel("Tablas");
+            	lblTablas.setHorizontalAlignment(SwingConstants.CENTER);
+            	lblTablas.setFont(new Font("Tahoma", Font.PLAIN, 16));
+            	lblTablas.setBounds(128, 0, 105, 22);
+            	panel.add(lblTablas);
+            	
+            	JLabel lblNewLabel = new JLabel("Atributos");
+            	lblNewLabel.setFont(new Font("Tahoma", Font.PLAIN, 16));
+            	lblNewLabel.setHorizontalAlignment(SwingConstants.CENTER);
+            	lblNewLabel.setBounds(555, 6, 87, 14);
+            	panel.add(lblNewLabel);
+            	
+            	JScrollPane scrollPane = new JScrollPane();
+            	scrollPane.setBounds(10, 24, 359, 104);
+            	panel.add(scrollPane);
+            	
+            	JList list = new JList();
+            	scrollPane.setViewportView(list);
+            	String [] elementos = log.getTables();
+            	list.setListData(elementos);
+            	JScrollPane scrollPane_1 = new JScrollPane();
+            	scrollPane_1.setBounds(379, 24, 385, 104);
+            	panel.add(scrollPane_1);
+            	
+            	JList list_1 = new JList();
+            	scrollPane_1.setViewportView(list_1);
+            }
            // setea la tabla para s�lo lectura (no se puede editar su contenido)  
            tabla.setEditable(false);       
-           
-           
-           
+          
          }
       } catch (Exception e) {
          e.printStackTrace();
@@ -134,6 +173,7 @@ public class ConsultasAdmin extends javax.swing.JInternalFrame
    private void thisComponentHidden(ComponentEvent evt) 
    {
       log.desconectar();
+      vPrincipal.volverPanelInicial();
    }
 
    private void btnEjecutarActionPerformed(ActionEvent evt) 
@@ -151,7 +191,7 @@ public class ConsultasAdmin extends javax.swing.JInternalFrame
 
     	  // obtenemos el modelo de la tabla a partir de la consulta para 
     	  // modificar la forma en que se muestran de algunas columnas  
-    	  tabla.createColumnModelFromQuery();    	    
+    	  tabla.createColumnModelFromQuery(); 
     	  for (int i = 0; i < tabla.getColumnCount(); i++)
     	  { // para que muestre correctamente los valores de tipo TIME (hora)  		   		  
     		 if	 (tabla.getColumn(i).getType()==Types.TIME)  
@@ -187,6 +227,4 @@ public class ConsultasAdmin extends javax.swing.JInternalFrame
       }
       
    }
-
-   
 }

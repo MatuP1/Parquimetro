@@ -1,25 +1,38 @@
 package parquimetro;
 import java.sql.Connection;
 import java.sql.DriverManager;
+import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
+
+import quick.dbtable.DBTable;
 public class Logica {
 	private String error = null;
 	private Connection cnx=null;
-	public Logica() {
+	public Logica() {System.out.println();}
+	public DBTable connectAdmin() {
+		DBTable tabla = new DBTable();
+	
 		if (this.cnx == null)
 	    {             
 	       try
 	       {  //se genera el string que define los datos de la conexion 
-	          String servidor = "localhost:3306";
-	          String baseDatos = "parquimetro";
+	    	  String driver ="com.mysql.cj.jdbc.Driver";
+	    	  String servidor = "localhost:3306";
+	          String baseDatos = "parquimetros";
 	          String usuario = "admin";
 	          String clave = "admin";
 	          String uri = "jdbc:mysql://" + servidor + "/" + baseDatos + 
 	          		          "?serverTimezone=America/Argentina/Buenos_Aires";
 	          //se intenta establecer la conexion
 	          cnx = DriverManager.getConnection(uri, usuario, clave);
+	         try {
+				tabla.connectDatabase(driver, uri, usuario, clave);
+			} catch (ClassNotFoundException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
 	       }
 	       catch (SQLException ex)
 	       {
@@ -29,12 +42,39 @@ public class Logica {
 	          System.out.println("VendorError: " + ex.getErrorCode());
 	       }
 	    }
+		return tabla;
 	}
+
 	public String getError() {
 		return error;
 	}
 	public Connection getConnection() {
 		return cnx;
+	}
+	public String[] getTables() {
+		String[] listaTablas = null;
+		try {
+			if(cnx.isValid(1000)) {
+				PreparedStatement consulta = cnx.prepareStatement("show tables;", ResultSet.TYPE_SCROLL_SENSITIVE, ResultSet.CONCUR_READ_ONLY);
+				consulta.execute();
+			    ResultSet resultados = consulta.getResultSet();
+			    int cantTablas=0;
+			    while(resultados.next())
+			    	cantTablas++;
+			    //reseteo el puntero
+			    resultados.beforeFirst();
+			    //cero el arreglo a devolver
+			    listaTablas = new String[cantTablas];
+			    for(int j=0; j<cantTablas; j++) {
+			        resultados.next();
+			        listaTablas[j] = resultados.getString(1);
+			    }
+			}
+		} catch (SQLException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		return listaTablas;
 	}
 	public boolean checkAdmin(String pass) {
 		boolean accede = false;
