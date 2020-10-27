@@ -1,6 +1,5 @@
 package parquimetro;
 
-import java.awt.BorderLayout;
 import java.awt.Dimension;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
@@ -8,11 +7,11 @@ import java.awt.event.ComponentAdapter;
 import java.awt.event.ComponentEvent;
 
 import java.sql.Types;
-import java.sql.Connection;
 //import java.sql.ResultSet;
 import java.sql.SQLException;
 
 import javax.swing.BorderFactory;
+import javax.swing.DefaultListModel;
 import javax.swing.JButton;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
@@ -25,12 +24,11 @@ import javax.swing.border.BevelBorder;
 
 import quick.dbtable.*;
 import javax.swing.JList;
-import javax.swing.border.LineBorder;
-import java.awt.Color;
 import javax.swing.JLabel;
 import java.awt.Font;
 import javax.swing.SwingConstants;
-import javax.swing.JTable; 
+import java.awt.event.MouseAdapter;
+import java.awt.event.MouseEvent; 
 
 
 @SuppressWarnings("serial")
@@ -44,11 +42,7 @@ public class ConsultasAdmin extends javax.swing.JInternalFrame
    private JScrollPane scrConsulta;
    private Logica log;
    private PrincipalWindow vPrincipal;
-   private JPanel panel;
-   private JTable table;
-   private DBTable table_1;
-   
-   
+   private JPanel panelListas;
    public ConsultasAdmin(PrincipalWindow v) 
    {
       super();
@@ -117,44 +111,54 @@ public class ConsultasAdmin extends javax.swing.JInternalFrame
          }
          {
         	// crea la tabla  
-        	tabla = log.connectAdmin();
+        	tabla = log.getTable();
         	
         	// Agrega la tabla al frame (no necesita JScrollPane como Jtable)
 
             tabla.setBounds(10, 336 , 754, 325);
             getContentPane().add(tabla);           
             {
-            	panel = new JPanel();
-            	panel.setBounds(0, 197, 774, 139);
-            	getContentPane().add(panel);
-            	panel.setLayout(null);
+            	panelListas = new JPanel();
+            	panelListas.setBounds(0, 197, 774, 139);
+            	getContentPane().add(panelListas);
+            	panelListas.setLayout(null);
             	           	
             	JLabel lblTablas = new JLabel("Tablas");
             	lblTablas.setHorizontalAlignment(SwingConstants.CENTER);
             	lblTablas.setFont(new Font("Tahoma", Font.PLAIN, 16));
             	lblTablas.setBounds(128, 0, 105, 22);
-            	panel.add(lblTablas);
+            	panelListas.add(lblTablas);
             	
             	JLabel lblNewLabel = new JLabel("Atributos");
             	lblNewLabel.setFont(new Font("Tahoma", Font.PLAIN, 16));
             	lblNewLabel.setHorizontalAlignment(SwingConstants.CENTER);
             	lblNewLabel.setBounds(555, 6, 87, 14);
-            	panel.add(lblNewLabel);
+            	panelListas.add(lblNewLabel);
             	
             	JScrollPane scrollPane = new JScrollPane();
             	scrollPane.setBounds(10, 24, 359, 104);
-            	panel.add(scrollPane);
-            	
-            	JList list = new JList();
-            	scrollPane.setViewportView(list);
-            	String [] elementos = log.getTables();
-            	list.setListData(elementos);
+            	panelListas.add(scrollPane);
+            	DefaultListModel modeloLista;
+            	modeloLista = log.getListaTablas();
+            	JList listaTablas = new JList(modeloLista);
+            	scrollPane.setViewportView(listaTablas);
             	JScrollPane scrollPane_1 = new JScrollPane();
             	scrollPane_1.setBounds(379, 24, 385, 104);
-            	panel.add(scrollPane_1);
+            	panelListas.add(scrollPane_1);
             	
-            	JList list_1 = new JList();
-            	scrollPane_1.setViewportView(list_1);
+            	
+            	
+            	listaTablas.addMouseListener(new MouseAdapter() {
+            		@Override
+            		public void mouseClicked(MouseEvent e) {
+            			DefaultListModel atributos = new DefaultListModel(); 
+            			String actual = (String) listaTablas.getSelectedValue();
+            			atributos=log.getValues(actual);
+            			JList listaAtr = new JList(atributos);
+                    	scrollPane_1.setViewportView(listaAtr);
+            		}
+            	});
+            	
             }
            // setea la tabla para s�lo lectura (no se puede editar su contenido)  
            tabla.setEditable(false);       

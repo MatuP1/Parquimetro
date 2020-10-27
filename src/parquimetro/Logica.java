@@ -6,13 +6,16 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
 
+import javax.swing.DefaultListModel;
+
 import quick.dbtable.DBTable;
 public class Logica {
 	private String error = null;
 	private Connection cnx=null;
+	private DBTable tabla = null;
 	public Logica() {System.out.println();}
-	public DBTable connectAdmin() {
-		DBTable tabla = new DBTable();
+	public DBTable connectAdmin(String pass) {
+		tabla = new DBTable();
 	
 		if (this.cnx == null)
 	    {             
@@ -22,7 +25,7 @@ public class Logica {
 	    	  String servidor = "localhost:3306";
 	          String baseDatos = "parquimetros";
 	          String usuario = "admin";
-	          String clave = "admin";
+	          String clave = pass;
 	          String uri = "jdbc:mysql://" + servidor + "/" + baseDatos + 
 	          		          "?serverTimezone=America/Argentina/Buenos_Aires";
 	          //se intenta establecer la conexion
@@ -48,33 +51,48 @@ public class Logica {
 	public String getError() {
 		return error;
 	}
+	public DBTable getTable() {
+		return tabla;
+	}
 	public Connection getConnection() {
 		return cnx;
 	}
-	public String[] getTables() {
-		String[] listaTablas = null;
+	public DefaultListModel getListaTablas() {
+		DefaultListModel listaTablas = null;
 		try {
-			if(cnx.isValid(1000)) {
+			if(cnx.isValid(100)) {
 				PreparedStatement consulta = cnx.prepareStatement("show tables;", ResultSet.TYPE_SCROLL_SENSITIVE, ResultSet.CONCUR_READ_ONLY);
 				consulta.execute();
 			    ResultSet resultados = consulta.getResultSet();
-			    int cantTablas=0;
-			    while(resultados.next())
-			    	cantTablas++;
-			    //reseteo el puntero
-			    resultados.beforeFirst();
-			    //cero el arreglo a devolver
-			    listaTablas = new String[cantTablas];
-			    for(int j=0; j<cantTablas; j++) {
-			        resultados.next();
-			        listaTablas[j] = resultados.getString(1);
+			    //creo la lista a devolver
+			    listaTablas = new DefaultListModel();
+			    while (resultados.next()) {
+			        listaTablas.addElement(resultados.getString(1));
+			    }
+		    }
+		} catch (SQLException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		return listaTablas;
+	}
+	public DefaultListModel getValues(String elemento) {
+		DefaultListModel atributos = new DefaultListModel();
+		try {
+			if(cnx.isValid(0)) {
+				PreparedStatement consulta = cnx.prepareStatement("describe "+elemento+";", ResultSet.TYPE_SCROLL_SENSITIVE, ResultSet.CONCUR_READ_ONLY);
+				consulta.execute();
+			    ResultSet resultados = consulta.getResultSet();
+			    //creo la lista a devolver
+			    while (resultados.next()) {
+			        atributos.addElement(resultados.getString(1));
 			    }
 			}
 		} catch (SQLException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
-		return listaTablas;
+		return atributos;
 	}
 	public boolean checkAdmin(String pass) {
 		boolean accede = false;
