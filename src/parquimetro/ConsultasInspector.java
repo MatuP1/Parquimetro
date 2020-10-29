@@ -6,16 +6,21 @@ import javax.swing.JLabel;
 import javax.swing.JSeparator;
 import javax.swing.JScrollPane;
 import javax.swing.SwingConstants;
+import javax.swing.SwingUtilities;
 
 import quick.dbtable.DBTable;
 
 import java.awt.Font;
 import javax.swing.JList;
+import javax.swing.JOptionPane;
 import javax.swing.JButton;
 import java.awt.event.KeyAdapter;
 import java.awt.event.KeyEvent;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
+import java.sql.SQLException;
+import java.sql.Types;
+
 import javax.swing.JTable;
 
 @SuppressWarnings("serial")
@@ -95,5 +100,43 @@ public class ConsultasInspector extends JInternalFrame {
 		btnMultas.setFont(new Font("Tahoma", Font.PLAIN, 14));
 		btnMultas.setBounds(10, 282, 453, 23);
 		getContentPane().add(btnMultas);
+		
+		table_ubicaciones = logica.getTable();
+		 try
+	      {  
+   	 // seteamos la consulta a partir de la cual se obtendr�n los datos para llenar la tabla
+   	 table_ubicaciones.setSelectSql("SELECT * FROM Ubicaciones;");
+
+   	  // obtenemos el modelo de la tabla a partir de la consulta para 
+   	  // modificar la forma en que se muestran de algunas columnas  
+   	  table_ubicaciones.createColumnModelFromQuery(); 
+   	  for (int i = 0; i < table_ubicaciones.getColumnCount(); i++)
+   	  { // para que muestre correctamente los valores de tipo TIME (hora)  		   		  
+   		 if	 (table_ubicaciones.getColumn(i).getType()==Types.TIME)  
+   		 {    		 
+   		    table_ubicaciones.getColumn(i).setType(Types.CHAR);  
+ 	       	 }
+   		 // cambiar el formato en que se muestran los valores de tipo DATE
+   		 if	 (table_ubicaciones.getColumn(i).getType()==Types.DATE)
+   		 {
+   		    table_ubicaciones.getColumn(i).setDateFormat("dd/MM/YYYY");
+   		 }
+         }  
+   	  // actualizamos el contenido de la tabla.   	     	  
+   	  table_ubicaciones.refresh();
+   	  
+	       }
+	      catch (SQLException ex)
+	      {
+	         // en caso de error, se muestra la causa en la consola
+	         System.out.println("SQLException: " + ex.getMessage());
+	         System.out.println("SQLState: " + ex.getSQLState());
+	         System.out.println("VendorError: " + ex.getErrorCode());
+	         JOptionPane.showMessageDialog(SwingUtilities.getWindowAncestor(this),
+	                                       ex.getMessage() + "\n", 
+	                                       "Error al ejecutar la consulta.",
+	                                       JOptionPane.ERROR_MESSAGE);
+	         
+	      }
 	}
 }

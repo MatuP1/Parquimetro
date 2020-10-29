@@ -138,9 +138,9 @@ public class Logica {
 	public boolean checkInspector(String legajo, String pass) {
 		boolean accede = false;
 		ResultSet insp = null;
-		System.out.println("El user pasado es "+legajo+"y el pass pasado a logica es "+pass);
+		System.out.println("El user pasado es "+legajo+" y el pass pasado a logica es "+pass);
 		try {
-			if(cnx.isValid(200)) {  //EN ESTA LINEA TIRA NULLPOINTER CON cnx
+			if(cnx.isValid(0)) {
 				insp = cnx.createStatement().executeQuery("select legajo,password from inspectores where legajo="+legajo+" and password=md5("+pass+");");
 			}
 		} catch (SQLException e) {
@@ -149,7 +149,7 @@ public class Logica {
 		}
 		if(insp != null) {
 			try {
-				if (!insp.wasNull())
+				if (insp.next())
 					accede=true;
 			} catch (SQLException e) {
 				System.out.println("Error en wasNull de inspector");
