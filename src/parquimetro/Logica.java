@@ -158,8 +158,7 @@ public class Logica {
 		}
 		return accede;
 	}
-	public void desconectar()
-	   {
+	public void desconectar(){
 	         try
 	         {
 	            cnx.close();     

@@ -55,7 +55,7 @@ public class PanelIngresoAdmin extends JPanel{
 		public void keyPressed(KeyEvent e) {
 			pass = new String(passwordField.getPassword());
 			System.out.println("El pass es: " + pass);
-			if(e.getKeyCode() == KeyEvent.VK_ENTER && logica.checkAdmin(pass)) { //TENGO EL PROBLEMA DE QUE PASSWORD ES NULL
+			if(e.getKeyCode() == KeyEvent.VK_ENTER && logica.checkAdmin(pass)) {
 				System.out.println("Checkadmin devolvio true");
 				logica.connectAdmin(pass);
 				ConsultasAdmin ca = new ConsultasAdmin(vPrincipal);
