@@ -60,6 +60,7 @@ public class PanelInicial extends JPanel {
 	private class OyenteInspector implements ActionListener {
 		public void actionPerformed(ActionEvent e) {
 				PanelIngresoInspector pii = new PanelIngresoInspector(vPrincipal);
+				vPrincipal.getLogica().connectAdmin("admin");
 				vPrincipal.cambiarPaneles(pii);
 			}
 		}

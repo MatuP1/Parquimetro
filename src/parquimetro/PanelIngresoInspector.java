@@ -72,8 +72,10 @@ public class PanelIngresoInspector extends JPanel {
 			System.out.println("El pass es: " + pass);
 			if(e.getKeyCode() == KeyEvent.VK_ENTER && logica.checkInspector(user,pass)) { 
 				System.out.println("CheckInspector devolvio true");
-				PanelInspector pi = new PanelInspector(vPrincipal);
-				vPrincipal.cambiarPaneles(pi);
+
+				logica.desconectar();
+				ConsultasInspector pi = new ConsultasInspector(vPrincipal);
+				vPrincipal.cambiarFrame(pi);
 			}
 		}
 

@@ -47,7 +47,40 @@ public class Logica {
 	    }
 		return tabla;
 	}
+	public DBTable connectInspector(String pass) {
+		tabla = new DBTable();
 
+		if (this.cnx == null)
+	    {             
+	       try
+	       {  //se genera el string que define los datos de la conexion 
+	    	  String driver ="com.mysql.cj.jdbc.Driver";
+	    	  String servidor = "localhost:3306";
+	          String baseDatos = "parquimetros";
+	          String usuario = "inspector";
+	          String clave = pass;
+	          String uri = "jdbc:mysql://" + servidor + "/" + baseDatos + 
+	          		          "?serverTimezone=America/Argentina/Buenos_Aires";
+	          //se intenta establecer la conexion
+	          cnx = DriverManager.getConnection(uri, usuario, clave);
+	         try {
+				tabla.connectDatabase(driver, uri, usuario, clave);
+			} catch (ClassNotFoundException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+	       }
+	       catch (SQLException ex)
+	       {
+	    	  error = ex.getMessage();
+	          System.out.println("SQLException: " + ex.getMessage());
+	          System.out.println("SQLState: " + ex.getSQLState());
+	          System.out.println("VendorError: " + ex.getErrorCode());
+	       }
+	    }
+		return tabla;
+	}
+	
 	public String getError() {
 		return error;
 	}

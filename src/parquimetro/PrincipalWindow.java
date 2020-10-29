@@ -12,7 +12,6 @@ public class PrincipalWindow extends JFrame{
 	private static final long serialVersionUID = 1L;
 	protected static final int AnchoVentana = 800, AltoVentana = 800;
 	
-	private PanelInspector panelInspector;
 	private PanelInicial panelInicio;
 	protected JPanel panelPrincipal;
 	private Logica logica; 
