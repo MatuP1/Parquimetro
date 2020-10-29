@@ -6,6 +6,9 @@ import javax.swing.JLabel;
 import javax.swing.JSeparator;
 import javax.swing.JScrollPane;
 import javax.swing.SwingConstants;
+
+import quick.dbtable.DBTable;
+
 import java.awt.Font;
 import javax.swing.JList;
 import javax.swing.JButton;
@@ -14,12 +17,15 @@ import java.awt.event.KeyEvent;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 
+@SuppressWarnings("serial")
 public class ConsultasInspector extends JInternalFrame {
 	private PrincipalWindow vPrincipal;
 	private Logica logica;
+	private DBTable multas;
 	public ConsultasInspector(PrincipalWindow pw) {
 		vPrincipal = pw;
 		logica = vPrincipal.getLogica();
+		multas = logica.connectInspector("inspector");
 		getContentPane().setLayout(null);
 		
 		JTextPane textPatentes = new JTextPane();

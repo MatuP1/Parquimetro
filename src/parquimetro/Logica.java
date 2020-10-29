@@ -93,7 +93,8 @@ public class Logica {
 	public DefaultListModel getListaTablas() {
 		DefaultListModel listaTablas = null;
 		try {
-			if(cnx.isValid(100)) {
+			if(cnx.isValid(0)) {
+			    System.out.println("conexion = 10 puntos pa");
 				PreparedStatement consulta = cnx.prepareStatement("show tables;", ResultSet.TYPE_SCROLL_SENSITIVE, ResultSet.CONCUR_READ_ONLY);
 				consulta.execute();
 			    ResultSet resultados = consulta.getResultSet();
@@ -157,7 +158,7 @@ public class Logica {
 		}
 		return accede;
 	}
-	 public void desconectar()
+	public void desconectar()
 	   {
 	         try
 	         {
