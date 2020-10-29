@@ -89,8 +89,15 @@ public class PanelIngresoInspector extends JPanel {
 				System.out.println("CheckInspector devolvio true");
 
 				logica.desconectar();
+<<<<<<< Updated upstream
 				System.out.println("Paso la desconexion");	
 				PanelInspector pi = new PanelInspector(vPrincipal);
+=======
+				System.out.println("Paso la desconexion");
+ 				//ConsultasInspector pi = new ConsultasInspector(vPrincipal);
+				//vPrincipal.cambiarFrame(pi);	
+				PanelInspector pi = new PanelInspector(vPrincipal,user,pass);
+>>>>>>> Stashed changes
 				vPrincipal.cambiarFrame(pi);
 				}else {
 					JOptionPane.showMessageDialog(null, "Legajo o Contraseña incorrecta","Mensaje Error", JOptionPane.WARNING_MESSAGE);

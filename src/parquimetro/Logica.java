@@ -52,7 +52,7 @@ public class Logica {
 
 		if (this.cnx == null)
 	    {        
-			System.out.println("Conecto la taa del inspector");
+			System.out.println("Conecto la tabla del inspector");
 	       try
 	       {  //se genera el string que define los datos de la conexion 
 	    	  String driver ="com.mysql.cj.jdbc.Driver";
