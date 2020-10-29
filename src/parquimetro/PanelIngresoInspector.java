@@ -74,8 +74,13 @@ public class PanelIngresoInspector extends JPanel {
 				System.out.println("CheckInspector devolvio true");
 
 				logica.desconectar();
- 				ConsultasInspector pi = new ConsultasInspector(vPrincipal);
+				System.out.println("Paso la desconexion");
+ 				//ConsultasInspector pi = new ConsultasInspector(vPrincipal);
+				//vPrincipal.cambiarFrame(pi);	
+				PanelInspector pi = new PanelInspector(vPrincipal);
 				vPrincipal.cambiarFrame(pi);
+				//ConsultasAdmin pa = new ConsultasAdmin(vPrincipal);
+				//vPrincipal.cambiarFrame(pa);
 			}
 		}
 

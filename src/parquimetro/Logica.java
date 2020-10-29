@@ -13,7 +13,7 @@ public class Logica {
 	private String error = null;
 	private Connection cnx=null;
 	private DBTable tabla = null;
-	public Logica() {System.out.println();}
+	public Logica() {}
 	public DBTable connectAdmin(String pass) {
 		tabla = new DBTable();
 	
@@ -51,7 +51,8 @@ public class Logica {
 		tabla = new DBTable();
 
 		if (this.cnx == null)
-	    {             
+	    {        
+			System.out.println("Conecto la taa del inspector");
 	       try
 	       {  //se genera el string que define los datos de la conexion 
 	    	  String driver ="com.mysql.cj.jdbc.Driver";
