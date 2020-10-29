@@ -175,8 +175,8 @@ public class ConsultasAdmin extends javax.swing.JInternalFrame
    
    private void thisComponentHidden(ComponentEvent evt) 
    {
-      log.desconectar();
       vPrincipal.volverPanelInicial();
+      log.desconectar();
    }
 
    private void btnEjecutarActionPerformed(ActionEvent evt) 

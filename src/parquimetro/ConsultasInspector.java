@@ -100,8 +100,8 @@ public class ConsultasInspector extends JInternalFrame {
 		btnMultas.setFont(new Font("Tahoma", Font.PLAIN, 14));
 		btnMultas.setBounds(10, 282, 453, 23);
 		getContentPane().add(btnMultas);
-		
 		table_ubicaciones = logica.getTable();
+		/**
 		 try
 	      {  
    	 // seteamos la consulta a partir de la cual se obtendr�n los datos para llenar la tabla
@@ -138,5 +138,6 @@ public class ConsultasInspector extends JInternalFrame {
 	                                       JOptionPane.ERROR_MESSAGE);
 	         
 	      }
+	      */
 	}
 }
