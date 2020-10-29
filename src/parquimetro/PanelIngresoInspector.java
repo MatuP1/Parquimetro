@@ -6,6 +6,7 @@ import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
 
 import javax.swing.JLabel;
+import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JPasswordField;
 import javax.swing.JTextField;
@@ -70,17 +71,18 @@ public class PanelIngresoInspector extends JPanel {
 			
 			System.out.println("El user es: " + user);
 			System.out.println("El pass es: " + pass);
-			if(e.getKeyCode() == KeyEvent.VK_ENTER && logica.checkInspector(user,pass)) { 
+			if(e.getKeyCode() == KeyEvent.VK_ENTER) {
+				if(logica.checkInspector(user,pass)) { 
 				System.out.println("CheckInspector devolvio true");
 
 				logica.desconectar();
-				System.out.println("Paso la desconexion");
- 				//ConsultasInspector pi = new ConsultasInspector(vPrincipal);
-				//vPrincipal.cambiarFrame(pi);	
+				System.out.println("Paso la desconexion");	
 				PanelInspector pi = new PanelInspector(vPrincipal);
 				vPrincipal.cambiarFrame(pi);
-				//ConsultasAdmin pa = new ConsultasAdmin(vPrincipal);
-				//vPrincipal.cambiarFrame(pa);
+				}else {
+					JOptionPane.showMessageDialog(null, "Legajo o Contraseña incorrecta","Mensaje Error", JOptionPane.WARNING_MESSAGE);
+				}
+
 			}
 		}
 
