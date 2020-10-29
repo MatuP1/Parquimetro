@@ -151,6 +151,7 @@ public class Logica {
 			try {
 				if (insp.next())
 					accede=true;
+					System.out.println(insp.getString("legajo")+insp.getString("password") );
 			} catch (SQLException e) {
 				System.out.println("Error en wasNull de inspector");
 				e.printStackTrace();
