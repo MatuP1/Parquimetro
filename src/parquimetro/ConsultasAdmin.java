@@ -140,7 +140,6 @@ public class ConsultasAdmin extends javax.swing.JInternalFrame
             	panelListas.add(scrollPane);
             	DefaultListModel modeloLista;
             	modeloLista = log.getListaTablas();
-                System.out.println("entre hola y chau pa");
             	JList listaTablas = new JList(modeloLista);
             	scrollPane.setViewportView(listaTablas);
             	JScrollPane scrollPane_1 = new JScrollPane();
@@ -178,8 +177,6 @@ public class ConsultasAdmin extends javax.swing.JInternalFrame
    {
       log.desconectar();
       vPrincipal.volverPanelInicial();
-      System.out.println("chauuuuu pa");
-
    }
 
    private void btnEjecutarActionPerformed(ActionEvent evt) 

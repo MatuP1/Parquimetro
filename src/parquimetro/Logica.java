@@ -162,7 +162,8 @@ public class Logica {
 	   {
 	         try
 	         {
-	            cnx.close();            
+	            cnx.close();     
+	            cnx=null;
 	         }
 	         catch (SQLException ex)
 	         {

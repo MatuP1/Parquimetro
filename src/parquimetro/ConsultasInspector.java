@@ -16,12 +16,15 @@ import java.awt.event.KeyAdapter;
 import java.awt.event.KeyEvent;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
+import javax.swing.JTable;
 
 @SuppressWarnings("serial")
 public class ConsultasInspector extends JInternalFrame {
 	private PrincipalWindow vPrincipal;
 	private Logica logica;
 	private DBTable multas;
+	private DBTable table_ubicaciones;
+	private DBTable table_parquimetros;
 	public ConsultasInspector(PrincipalWindow pw) {
 		vPrincipal = pw;
 		logica = vPrincipal.getLogica();
@@ -46,16 +49,16 @@ public class ConsultasInspector extends JInternalFrame {
 		scrollPane.setBounds(170, 34, 293, 91);
 		getContentPane().add(scrollPane);
 		
-		JList list_ubicaciones = new JList();
-		scrollPane.setViewportView(list_ubicaciones);
+		table_ubicaciones = new DBTable();
+		scrollPane.setViewportView(table_ubicaciones);
 		
 		JScrollPane scrollPane_1 = new JScrollPane();
 		scrollPane_1.setEnabled(false);
 		scrollPane_1.setBounds(170, 161, 293, 98);
 		getContentPane().add(scrollPane_1);
 		
-		JList list_parquimetros = new JList();
-		scrollPane_1.setViewportView(list_parquimetros);
+		table_parquimetros = new DBTable();
+		scrollPane_1.setViewportView(table_parquimetros);
 		
 		JLabel lblNewLabel_1 = new JLabel("Parquimetros");
 		lblNewLabel_1.setFont(new Font("Tahoma", Font.PLAIN, 14));
