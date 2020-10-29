@@ -19,12 +19,8 @@
 *.tar.gz
 *.rar
 .classpath
+C:\Users\matia\OneDrive\Documents\GitHub\Parquimetro\.classpath
+*.classpath
 # virtual machine crash logs, see http://www.java.com/en/download/help/error_hotspot.xml
 hs_err_pid*
 /bin/
-.classpath
-.classpath
-.classpath
-.classpath
-.classpath
-.classpath
