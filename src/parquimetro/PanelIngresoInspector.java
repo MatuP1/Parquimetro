@@ -4,7 +4,10 @@ import java.awt.BorderLayout;
 import java.awt.GridBagLayout;
 import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
+import java.awt.event.MouseAdapter;
+import java.awt.event.MouseEvent;
 
+import javax.swing.JButton;
 import javax.swing.JLabel;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
@@ -60,7 +63,17 @@ public class PanelIngresoInspector extends JPanel {
 		panel.add(panelUser,BorderLayout.NORTH);
 		panel.add(panelPassword,BorderLayout.CENTER);
 		
+		JButton btnBack = new JButton("Volver a Inicio");
+		btnBack.addMouseListener(new MouseAdapter() {
+ 			@Override
+ 			public void mouseClicked(MouseEvent e) {
+ 				logica.desconectar();
+ 				vPrincipal.volverPanelInicial();
+ 			}
+ 		});
+		
 		this.add(panel);
+		this.add(btnBack);
 	}
 	
 	private class OyentePass implements KeyListener{
