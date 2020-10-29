@@ -77,10 +77,38 @@ public class PanelInspector extends JInternalFrame {
 	         });
 	         getContentPane().setLayout(null);
 	         {
+
+	     		JButton btnPatentes = new JButton("Ingresar Patentes");
+	     		btnPatentes.addMouseListener(new MouseAdapter() {
+	     			@Override
+	     			public void mouseClicked(MouseEvent e) {
+	     				String pat=textPatentes.getText();
+	     				
+	     			}
+	     		});
+	     		btnPatentes.setEnabled(false);
+	     		btnPatentes.setFont(new Font("Tahoma", Font.PLAIN, 12));
+	     		btnPatentes.setHorizontalAlignment(SwingConstants.LEFT);
+	     		btnPatentes.setBounds(10, 236, 137, 21);
+	     		getContentPane().add(btnPatentes);
+	     		
+	     		JLabel lblNewLabel = new JLabel("Patentes");
+	     		lblNewLabel.setFont(new Font("Tahoma", Font.PLAIN, 14));
+	     		lblNewLabel.setHorizontalAlignment(SwingConstants.CENTER);
+	     		lblNewLabel.setBounds(10, 9, 137, 14);
+	     		getContentPane().add(lblNewLabel);
+	     		
+	     		JButton btnMultas = new JButton("Generar Multas");
+	     		btnMultas.setEnabled(false);
+	     		btnMultas.setFont(new Font("Tahoma", Font.PLAIN, 14));
+	     		btnMultas.setBounds(10, 282, 453, 23);
+	     		getContentPane().add(btnMultas);
+	     		
 	        	textPatentes = new JTextPane();
 	     		textPatentes.addKeyListener(new KeyAdapter() {
 	     			@Override
 	     			public void keyTyped(KeyEvent e) {
+	     				btnPatentes.setEnabled(true);
 	     			}
 	     		});
 	     		textPatentes.setBounds(10, 34, 137, 200);
@@ -121,6 +149,9 @@ public class PanelInspector extends JInternalFrame {
 	     			public void mouseClicked(MouseEvent e) {
 	     				
 	     				String calle,altura;
+	     				boolean falsisimo = false;
+	     				textPatentes.setEnabled(falsisimo);
+	     				textPatentes.setText("");
 	    				int fila = table_ubicaciones.getSelectedRow();
 	    				calle = table_ubicaciones.getValueAt(fila, 0).toString();
 	    				altura= table_ubicaciones.getValueAt(fila, 1).toString();
@@ -174,29 +205,6 @@ public class PanelInspector extends JInternalFrame {
 	     		lblNewLabel_2.setBounds(170, 11, 293, 21);
 	     		getContentPane().add(lblNewLabel_2);
 	     		
-	     		JButton btnPatentes = new JButton("Ingresar Patentes");
-	     		btnPatentes.addMouseListener(new MouseAdapter() {
-	     			@Override
-	     			public void mouseClicked(MouseEvent e) {
-	     			}
-	     		});
-	     		btnPatentes.setEnabled(false);
-	     		btnPatentes.setFont(new Font("Tahoma", Font.PLAIN, 12));
-	     		btnPatentes.setHorizontalAlignment(SwingConstants.LEFT);
-	     		btnPatentes.setBounds(10, 236, 137, 21);
-	     		getContentPane().add(btnPatentes);
-	     		
-	     		JLabel lblNewLabel = new JLabel("Patentes");
-	     		lblNewLabel.setFont(new Font("Tahoma", Font.PLAIN, 14));
-	     		lblNewLabel.setHorizontalAlignment(SwingConstants.CENTER);
-	     		lblNewLabel.setBounds(10, 9, 137, 14);
-	     		getContentPane().add(lblNewLabel);
-	     		
-	     		JButton btnMultas = new JButton("Generar Multas");
-	     		btnMultas.setEnabled(false);
-	     		btnMultas.setFont(new Font("Tahoma", Font.PLAIN, 14));
-	     		btnMultas.setBounds(10, 282, 453, 23);
-	     		getContentPane().add(btnMultas);
 	         }
 	      } catch (Exception e) {
 	         e.printStackTrace();
