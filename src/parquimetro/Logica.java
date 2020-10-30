@@ -184,6 +184,7 @@ public class Logica {
 			if (rs.next())
 				pertenece=true;
 		} catch (SQLException ex) {
+			System.out.println("checkUbicacion1");
 			   System.out.println("SQLException: " + ex.getMessage());
 	            System.out.println("SQLState: " + ex.getSQLState());
 	            System.out.println("VendorError: " + ex.getErrorCode());
@@ -208,7 +209,8 @@ public class Logica {
 		try {
 			cnx.createStatement().execute("INSERT INTO accede VALUES("+legajoInsp+","+id_parq+","+"\""+fecha+"\""+","+"\""+horario+"\""+");");
 		} catch (SQLException ex) {
-			   System.out.println("SQLException: " + ex.getMessage());
+				System.out.println("registrarAcceso1");
+				System.out.println("SQLException: " + ex.getMessage());
 	            System.out.println("SQLState: " + ex.getSQLState());
 	            System.out.println("VendorError: " + ex.getErrorCode());
 		}
@@ -248,22 +250,33 @@ public class Logica {
 		int id_asociado=0;
 		if(rs_aux.next())
 			id_asociado=rs_aux.getInt(1);
-		while(rs_autosEstacionados.next()) {	
+		boolean esta=false;
+		boolean hayautos =rs_autosEstacionados.next();
+		
+		if(!hayautos) { //Si no hay autos estacionados, genera multas a todos los autos registrados por el inspector
+			for(int cont=0; cont<patentesValidas.length;cont++) {
+				cnx.createStatement().execute("INSERT INTO multa(fecha,hora,patente,id_asociado_con) VALUES("+"\""+fecha+"\""+","+"\""+horario+"\""+","+"\""+patentesValidas[cont]+"\""+","+id_asociado+");");	
+			}
+		}
+		
+		while(hayautos) {//Si hay autos estacionados, checkea que los autos esten estacionados sino les hace una multa
 			patenteActual=rs_autosEstacionados.getString(1);
-			boolean esta=false;
 			i=0;
 			while(!esta && i<patentesValidas.length && patentesValidas[i]!=null && patentesValidas[i]!="" ) {
 				if(patentesValidas[i] == patenteActual) {
 					esta = true;
 				}
+				i++;
 			}
 			if(!esta) {
-				cnx.createStatement().execute("INSERT INTO multa(fecha,hora,patente,id_asociado_con) VALUES("+fecha+","+"\""+horario+"\""+","+"\""+patenteActual+"\""+","+id_asociado+");");
+				cnx.createStatement().execute("INSERT INTO multa(fecha,hora,patente,id_asociado_con) VALUES("+"\""+fecha+"\""+","+"\""+horario+"\""+","+"\""+patenteActual+"\""+","+id_asociado+");");
+				esta=false;
 			}
+			hayautos=rs_autosEstacionados.next();
 		}
 		
-		
 		} catch (SQLException ex) {
+				System.out.println("generarMultas1");
 			   System.out.println("SQLException: " + ex.getMessage());
 	           System.out.println("SQLState: " + ex.getSQLState());
 	           System.out.println("VendorError: " + ex.getErrorCode());
