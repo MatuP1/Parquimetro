@@ -40,7 +40,7 @@ import javax.swing.table.DefaultTableModel;
 
 import quick.dbtable.DBTable;
 
-public class PanelInspector extends JInternalFrame {
+public class ConsultasInspector extends JInternalFrame {
 	
 	private static final long serialVersionUID = 1L;
 	private PrincipalWindow vPrincipal;
@@ -55,7 +55,7 @@ public class PanelInspector extends JInternalFrame {
 	private int horaPrimerMulta = 0;
 	private int minutosPrimerMulta = 0;
 	
-	public PanelInspector(PrincipalWindow v, String legajo, String pass) {
+	public ConsultasInspector(PrincipalWindow v, String legajo, String pass) {
 		vPrincipal = v;
 		passInsp = pass;
 		legajoInsp = legajo;
