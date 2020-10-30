@@ -220,18 +220,21 @@ public class Logica {
 		//Primero hay que checkear que las patentes esten el la base de datos
 		boolean correcto=true;
 		String [] patentesValidas = new String[patentes.length];
-		int j=0;
 		try {
+			int j=0;
 			for(int i=0; i<patentes.length;i++) {
 				ResultSet rs = cnx.createStatement().executeQuery("SELECT DISTINCT A.patente FROM tarjetas as A where A.patente="+"\""+patentes[i]+"\""+";");
 				if(rs.next()) {
 					patentesValidas[j]=patentes[i];
 					j++;
 				}
-				else
+				else {
 					correcto = false;
+				}
 			}
-		ResultSet rs_autosEstacionados = cnx.createStatement().executeQuery("SELECT T.patente FROM tarjetas as T NATURAL JOIN estacionados as E NATURAL JOIN parquimetros as P WHERE p.calle="+"\""+calle+"\""+" AND p.altura="+altura+";");
+			//HASTA ACA VA BIEN
+		int cantPatentesValidas = j;
+		ResultSet rs_autosEstacionados = cnx.createStatement().executeQuery("SELECT DISTINCT T.patente FROM tarjetas as T NATURAL JOIN estacionados as E NATURAL JOIN parquimetros as P WHERE p.calle="+"\""+calle+"\""+" AND p.altura="+altura+";");
 		String patenteActual="";
 		int i=0;
 		Calendar calendario = new GregorianCalendar();
@@ -254,24 +257,27 @@ public class Logica {
 		boolean hayautos =rs_autosEstacionados.next();
 		
 		if(!hayautos) { //Si no hay autos estacionados, genera multas a todos los autos registrados por el inspector
-			for(int cont=0; cont<patentesValidas.length;cont++) {
+			for(int cont=0; cont<cantPatentesValidas;cont++) {
 				cnx.createStatement().execute("INSERT INTO multa(fecha,hora,patente,id_asociado_con) VALUES("+"\""+fecha+"\""+","+"\""+horario+"\""+","+"\""+patentesValidas[cont]+"\""+","+id_asociado+");");	
 			}
 		}
-		
-		while(hayautos) {//Si hay autos estacionados, checkea que los autos esten estacionados sino les hace una multa
-			patenteActual=rs_autosEstacionados.getString(1);
-			i=0;
-			while(!esta && i<patentesValidas.length && patentesValidas[i]!=null && patentesValidas[i]!="" ) {
-				if(patentesValidas[i] == patenteActual) {
+		i=0;
+		while(hayautos && i<cantPatentesValidas) {//Si hay autos estacionados, checkea que los autos esten estacionados sino les hace una multa	
+			esta=false;
+			while(!esta && hayautos ) {
+				patenteActual=rs_autosEstacionados.getString(1);
+				if(patentesValidas[i].equalsIgnoreCase(patenteActual)) {
 					esta = true;
 				}
-				i++;
+				hayautos=rs_autosEstacionados.next();
 			}
+			
 			if(!esta) {
-				cnx.createStatement().execute("INSERT INTO multa(fecha,hora,patente,id_asociado_con) VALUES("+"\""+fecha+"\""+","+"\""+horario+"\""+","+"\""+patenteActual+"\""+","+id_asociado+");");
-				esta=false;
+				String patente=patentes[i].toUpperCase();
+				cnx.createStatement().execute("INSERT INTO multa(fecha,hora,patente,id_asociado_con) VALUES("+"\""+fecha+"\""+","+"\""+horario+"\""+","+"\""+patente+"\""+","+id_asociado+");");
 			}
+			i++;
+			rs_autosEstacionados = cnx.createStatement().executeQuery("SELECT DISTINCT T.patente FROM tarjetas as T NATURAL JOIN estacionados as E NATURAL JOIN parquimetros as P WHERE p.calle="+"\""+calle+"\""+" AND p.altura="+altura+";");
 			hayautos=rs_autosEstacionados.next();
 		}
 		

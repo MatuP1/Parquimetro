@@ -7,8 +7,10 @@ import java.awt.event.ComponentAdapter;
 import java.awt.event.ComponentEvent;
 
 import java.sql.Types;
+import java.sql.ResultSet;
 //import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.sql.Statement;
 
 import javax.swing.BorderFactory;
 import javax.swing.DefaultListModel;
@@ -188,37 +190,26 @@ public class ConsultasAdmin extends javax.swing.JInternalFrame
    {
       try
       {  
-    	  
-    	 // seteamos la consulta a partir de la cual se obtendr�n los datos para llenar la tabla
-    	 tabla.setSelectSql(this.txtConsulta.getText().trim());
+    	 Statement consulta = log.getConnection().createStatement();
+    	 consulta.execute(this.txtConsulta.getText().trim());
+    	 ResultSet rs_consulta = consulta.getResultSet();
 
-    	  // obtenemos el modelo de la tabla a partir de la consulta para 
-    	  // modificar la forma en que se muestran de algunas columnas  
-    	  tabla.createColumnModelFromQuery(); 
+    	  tabla.refresh(rs_consulta);; 
     	  for (int i = 0; i < tabla.getColumnCount(); i++)
-    	  { // para que muestre correctamente los valores de tipo TIME (hora)  		   		  
+    	  {  		   		  
     		 if	 (tabla.getColumn(i).getType()==Types.TIME)  
     		 {    		 
     		    tabla.getColumn(i).setType(Types.CHAR);  
   	       	 }
-    		 // cambiar el formato en que se muestran los valores de tipo DATE
     		 if	 (tabla.getColumn(i).getType()==Types.DATE)
     		 {
     		    tabla.getColumn(i).setDateFormat("dd/MM/YYYY");
     		 }
           }  
-    	  // actualizamos el contenido de la tabla.   	     	  
-    	  tabla.refresh();
-    	  // No es necesario establecer  una conexi�n, crear una sentencia y recuperar el 
-    	  // resultado en un resultSet, esto lo hace autom�ticamente la tabla (DBTable) a 
-    	  // patir de la conexi�n y la consulta seteadas con connectDatabase() y setSelectSql() respectivamente.
-          
-    	  
-    	  
+  
        }
       catch (SQLException ex)
       {
-         // en caso de error, se muestra la causa en la consola
          System.out.println("SQLException: " + ex.getMessage());
          System.out.println("SQLState: " + ex.getSQLState());
          System.out.println("VendorError: " + ex.getErrorCode());

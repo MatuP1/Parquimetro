@@ -10,6 +10,7 @@ import java.awt.BorderLayout;
 import java.awt.GridBagLayout;
 
 import javax.swing.JPasswordField;
+import javax.swing.JButton;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
 
@@ -37,7 +38,6 @@ public class PanelIngresoAdmin extends JPanel{
 		panel.setBounds(0, 0, 200, 200);
 		
 		passwordField = new JPasswordField(30);
-		//String password = new String(passwordField.getPassword());
 		passwordField.addKeyListener(LPass);
 		
 		JLabel labelIngreso = new JLabel("Ingrese su contraseña");
@@ -45,8 +45,15 @@ public class PanelIngresoAdmin extends JPanel{
 		panel.add(labelIngreso);
 		panel.add(passwordField);
 		
-		//System.out.println("El pass es: " + password);
-		this.add(panel);	
+		JButton btnBack = new JButton("Volver al Inicio");
+		btnBack.addActionListener(new ActionListener() {
+            public void actionPerformed(ActionEvent evt) {
+               vPrincipal.volverPanelInicial();
+            }
+         });
+		
+		this.add(panel);
+		this.add(btnBack);
 	}
 	
 	

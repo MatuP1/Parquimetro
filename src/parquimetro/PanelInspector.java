@@ -244,8 +244,11 @@ public class PanelInspector extends JInternalFrame {
 	                    }
 	                    else {
 		                    logica.registrarAcceso(legajoInsp,id_parq,fecha,horario);
-		                	logica.generarMultas(legajoInsp,calle,altura,fecha,horario,patentes);
-		                	String sql_multas="SELECT M.numero, M.fecha, M.hora, AC.calle, AC.altura, M.patente, AC.legajo from multa as M NATURAL JOIN asociado_con as AC WHERE ("+horaActual+" > "+horaPrimerMulta+" OR ("+horaActual+"="+horaPrimerMulta+" AND "+minutos+">="+minutosPrimerMulta+"));";
+		                	boolean multasgeneradas = logica.generarMultas(legajoInsp,calle,altura,fecha,horario,patentes);
+		                	if(!multasgeneradas) {
+		                		JOptionPane.showMessageDialog(null, "Hay patentes que no pertenecen a la base de datos","Mensaje Error", JOptionPane.WARNING_MESSAGE);
+		                	}
+		                	String sql_multas="SELECT M.numero, M.fecha, M.hora, AC.calle, AC.altura, M.patente, AC.legajo from multa as M NATURAL JOIN asociado_con as AC WHERE ("+horaActual+" > "+horaPrimerMulta+" OR ("+horaActual+"="+horaPrimerMulta+" AND "+minutos+">="+minutosPrimerMulta+")) AND M.fecha ="+"\""+fecha+"\""+" AND AC.legajo ="+legajoInsp+";";
 		                	Statement st_multas = logica.getConnection().createStatement();
 		                	st_multas.execute(sql_multas);
 		                	ResultSet rs_multas=st_multas.getResultSet();
