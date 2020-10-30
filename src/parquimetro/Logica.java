@@ -213,9 +213,28 @@ public class Logica {
 		}
 		
 	}
-	public void generarMultas(String legajoInsp, String calle, String altura, int diaActual, int horaActual,
-			int minutos, String[] patentes) {
-		// TODO Auto-generated method stub
+	public void generarMultas(String legajoInsp, String calle, String altura, int diaActual, int horaActual,int minutos, String[] patentes) {
+		//Primero hay que checkear que las patentes esten el la base de datos
+		
+		String [] patentesValidas = new String[patentes.length];
+		int j=0;
+		try {
+			for(int i=0; i<patentes.length;i++) {
+				ResultSet rs = cnx.createStatement().executeQuery("SELECT A.patente FROM automoviles where A.patente="+patentes[i]);
+				if(rs.next()) {
+					patentesValidas[j]=patentes[i];
+					j++;
+				}
+			}
+		} catch (SQLException ex) {
+			   System.out.println("SQLException: " + ex.getMessage());
+	           System.out.println("SQLState: " + ex.getSQLState());
+	           System.out.println("VendorError: " + ex.getErrorCode());
+		}
+		
+		//Las patentes que esten en la base de datos hay que generales multas sino tienen un estacionamiento abierto
+		
+		
 		
 	}
 
