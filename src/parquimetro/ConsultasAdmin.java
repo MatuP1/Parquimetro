@@ -8,7 +8,6 @@ import java.awt.event.ComponentEvent;
 
 import java.sql.Types;
 import java.sql.ResultSet;
-//import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
 
@@ -111,11 +110,8 @@ public class ConsultasAdmin extends javax.swing.JInternalFrame
             	});
             }	
          }
-         {
-        	// crea la tabla  
+         {  
         	tabla = log.getTable();
-        	
-        	// Agrega la tabla al frame (no necesita JScrollPane como Jtable)
 
             tabla.setBounds(10, 336 , 754, 325);
             getContentPane().add(tabla);           
@@ -162,7 +158,6 @@ public class ConsultasAdmin extends javax.swing.JInternalFrame
             	});
             	
             }
-           // setea la tabla para s�lo lectura (no se puede editar su contenido)  
            tabla.setEditable(false);       
           
          }

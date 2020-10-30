@@ -1,17 +1,14 @@
 package parquimetro;
 
 import javax.swing.JPanel;
-import java.awt.GridLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
-import java.awt.BorderLayout;
 import java.awt.GridBagLayout;
 
 import javax.swing.JPasswordField;
 import javax.swing.JButton;
-import javax.swing.JFrame;
 import javax.swing.JLabel;
 
 public class PanelIngresoAdmin extends JPanel{
@@ -20,7 +17,7 @@ public class PanelIngresoAdmin extends JPanel{
 	private PrincipalWindow vPrincipal;
 	private Logica logica;
 	private int Ancho,Alto;
-	private String password,pass;
+	private String pass;
 	private JPasswordField passwordField;
 
 	
@@ -61,9 +58,7 @@ public class PanelIngresoAdmin extends JPanel{
 		@Override
 		public void keyPressed(KeyEvent e) {
 			pass = new String(passwordField.getPassword());
-			System.out.println("El pass es: " + pass);
 			if(e.getKeyCode() == KeyEvent.VK_ENTER && logica.checkAdmin(pass)) {
-				System.out.println("Checkadmin devolvio true");
 				logica.connectAdmin(pass);
 				ConsultasAdmin ca = new ConsultasAdmin(vPrincipal);
 				vPrincipal.cambiarFrame(ca);

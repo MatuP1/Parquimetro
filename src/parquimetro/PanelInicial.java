@@ -5,11 +5,8 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 
 import javax.swing.JButton;
-import javax.swing.JFrame;
 import javax.swing.JLabel;
-import javax.swing.JOptionPane;
 import javax.swing.JPanel;
-import javax.swing.JPasswordField;
 import javax.swing.SwingConstants;
 
 public class PanelInicial extends JPanel {
@@ -20,13 +17,9 @@ public class PanelInicial extends JPanel {
 	static final String btnInspectorString = "Inspector";
 	
 	private PrincipalWindow vPrincipal;
-	private int Ancho,Alto;
-	private JPasswordField passwordField;
 	
 	public PanelInicial(PrincipalWindow v) {
 		vPrincipal = v;
-		Ancho=v.getAncho();
-		Alto=v.getAlto();
 		
 		this.setLayout(new GridLayout(0, 1, 0, 0));
 		this.setBounds(0, 0, 928, 512);

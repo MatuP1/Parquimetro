@@ -79,16 +79,10 @@ public class PanelIngresoInspector extends JPanel {
 		public void keyPressed(KeyEvent e) {
 			pass = new String(passwordField.getPassword());
 			user = new String(userField.getText());
-			
-			System.out.println("El user es: " + user);
-			System.out.println("El pass es: " + pass);
 			if(e.getKeyCode() == KeyEvent.VK_ENTER) {
 				if(logica.checkInspector(user,pass)) { 
-				System.out.println("CheckInspector devolvio true");
-
-				logica.desconectar();
-				System.out.println("Paso la desconexion");	
-				ConsultasInspector pi = new ConsultasInspector(vPrincipal,user,pass);
+				logica.desconectar();	
+				ConsultasInspector pi = new ConsultasInspector(vPrincipal,user);
 				vPrincipal.cambiarFrame(pi);
 				}else {
 					JOptionPane.showMessageDialog(null, "Legajo o Contraseña incorrecta","Mensaje Error", JOptionPane.WARNING_MESSAGE);

@@ -14,29 +14,24 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
 import java.sql.Types;
-import java.text.DateFormat;
-import java.text.SimpleDateFormat;
-import java.util.Date;
 
 import java.util.Calendar;
 import java.util.GregorianCalendar;
-import javax.swing.BorderFactory;
-import javax.swing.DefaultListModel;
+
 import javax.swing.JButton;
 import javax.swing.JInternalFrame;
 import javax.swing.JLabel;
-import javax.swing.JList;
+
 import javax.swing.JOptionPane;
-import javax.swing.JPanel;
+
 import javax.swing.JScrollPane;
 import javax.swing.JSeparator;
-import javax.swing.JTextArea;
+
 import javax.swing.JTextPane;
 import javax.swing.SwingConstants;
 import javax.swing.SwingUtilities;
 import javax.swing.WindowConstants;
-import javax.swing.border.BevelBorder;
-import javax.swing.table.DefaultTableModel;
+
 
 import quick.dbtable.DBTable;
 
@@ -49,15 +44,13 @@ public class ConsultasInspector extends JInternalFrame {
 	private DBTable table_ubicaciones;
 	private DBTable table_parquimetros;
 	private String legajoInsp;
-	private String passInsp;
 	private JTextPane textPatentes;
 	private String[] patentes;
 	private int horaPrimerMulta = 0;
 	private int minutosPrimerMulta = 0;
 	
-	public ConsultasInspector(PrincipalWindow v, String legajo, String pass) {
+	public ConsultasInspector(PrincipalWindow v, String legajo) {
 		vPrincipal = v;
-		passInsp = pass;
 		legajoInsp = legajo;
 		logica = v.getLogica();
 		multas = logica.connectInspector("inspector");
@@ -165,9 +158,7 @@ public class ConsultasInspector extends JInternalFrame {
 	    				int fila = table_ubicaciones.getSelectedRow();
 	    				calle = table_ubicaciones.getValueAt(fila, 0).toString();
 	    				altura= table_ubicaciones.getValueAt(fila, 1).toString();
-	    				System.out.println("la calle es:"+calle+" y la altura: "+altura);
 	     				String sql_parq="SELECT DISTINCT P.id_parq,P.numero,P.calle,P.altura from asociado_con as ID NATURAL JOIN ubicaciones as U NATURAL JOIN parquimetros AS P where ID.legajo ="+legajoInsp+" AND P.calle=\""+calle+"\" AND P.altura="+altura;
-	     				System.out.println(sql_parq);
 	     				try {
 	    				Statement st_parq = logica.getConnection().createStatement();
 	    				ResultSet rs_parq = st_parq.executeQuery(sql_parq);
@@ -254,12 +245,12 @@ public class ConsultasInspector extends JInternalFrame {
 		                	ResultSet rs_multas=st_multas.getResultSet();
 		                	multas.refresh(rs_multas);
 		                	 for (int i = 0; i < multas.getColumnCount(); i++)
-		               	  { // para que muestre correctamente los valores de tipo TIME (hora)  		   		  
+		               	  {		   		  
 		               		 if	 (multas.getColumn(i).getType()==Types.TIME)  
 		               		 {    		 
 		               		    multas.getColumn(i).setType(Types.CHAR);  
 		             	       	 }
-		               		 // cambiar el formato en que se muestran los valores de tipo DATE
+		               		 
 		               		 if	 (multas.getColumn(i).getType()==Types.DATE)
 		               		 {
 		               		    multas.getColumn(i).setDateFormat("dd/MM/YYYY");
