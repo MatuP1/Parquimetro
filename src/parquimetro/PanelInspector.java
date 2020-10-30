@@ -14,7 +14,12 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
 import java.sql.Types;
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
+import java.util.Date;
 
+import java.util.Calendar;
+import java.util.GregorianCalendar;
 import javax.swing.BorderFactory;
 import javax.swing.DefaultListModel;
 import javax.swing.JButton;
@@ -46,6 +51,8 @@ public class PanelInspector extends JInternalFrame {
 	private String legajoInsp;
 	private String passInsp;
 	private JTextPane textPatentes;
+	private String[] patentes;
+	private String horaPrimerMulta;
 	
 	public PanelInspector(PrincipalWindow v, String legajo, String pass) {
 		vPrincipal = v;
@@ -77,15 +84,16 @@ public class PanelInspector extends JInternalFrame {
 	         });
 	         getContentPane().setLayout(null);
 	         {
-
+		     	JButton btnMultas = new JButton("Generar Multas");
+		     	textPatentes = new JTextPane();
 	     		JButton btnPatentes = new JButton("Ingresar Patentes");
-	     		btnPatentes.addMouseListener(new MouseAdapter() {
-	     			@Override
-	     			public void mouseClicked(MouseEvent e) {
-	     				String pat=textPatentes.getText();
-	     				
-	     			}
-	     		});
+	     		btnPatentes.addActionListener(new ActionListener() {
+	                  public void actionPerformed(ActionEvent evt) {
+	                	  btnMultas.setEnabled(true);
+	                	  patentes = textPatentes.getText().split("\n");
+	                	  textPatentes.setText("Se ingresaron las patentes correctamente, si desea ingresar mas patentes destruya este texto");
+	                  }
+	            });
 	     		btnPatentes.setEnabled(false);
 	     		btnPatentes.setFont(new Font("Tahoma", Font.PLAIN, 12));
 	     		btnPatentes.setHorizontalAlignment(SwingConstants.LEFT);
@@ -98,13 +106,12 @@ public class PanelInspector extends JInternalFrame {
 	     		lblNewLabel.setBounds(10, 9, 137, 14);
 	     		getContentPane().add(lblNewLabel);
 	     		
-	     		JButton btnMultas = new JButton("Generar Multas");
 	     		btnMultas.setEnabled(false);
 	     		btnMultas.setFont(new Font("Tahoma", Font.PLAIN, 14));
-	     		btnMultas.setBounds(10, 282, 453, 23);
+	     		btnMultas.setBounds(10, 327, 764, 23);
 	     		getContentPane().add(btnMultas);
 	     		
-	        	textPatentes = new JTextPane();
+	        	
 	     		textPatentes.addKeyListener(new KeyAdapter() {
 	     			@Override
 	     			public void keyTyped(KeyEvent e) {
@@ -113,19 +120,20 @@ public class PanelInspector extends JInternalFrame {
 	     		});
 	     		textPatentes.setBounds(10, 34, 137, 200);
 	     		textPatentes.setEnabled(false);
+	     		textPatentes.setText("Bienvenido Inspector");
 	     		getContentPane().add(textPatentes);
 	     		
 	     		JSeparator separator = new JSeparator();
-	     		separator.setBounds(170, 133, 293, 2);
+	     		separator.setBounds(170, 172, 567, -1);
 	     		getContentPane().add(separator);
 	     		
-	     		JScrollPane scrollPane = new JScrollPane();
+	     		JScrollPane scrollPaneUbicaciones = new JScrollPane();
 	     		table_parquimetros = new DBTable();
 	     		table_ubicaciones= new DBTable();
 	     		
-	     		scrollPane.setEnabled(true);
-	     		scrollPane.setBounds(170, 34, 293, 91);
-	     		getContentPane().add(scrollPane);
+	     		scrollPaneUbicaciones.setEnabled(true);
+	     		scrollPaneUbicaciones.setBounds(170, 34, 567, 137);
+	     		getContentPane().add(scrollPaneUbicaciones);
 
 	     		try {
 	     			String sql="Select distinct U.calle,U.altura,U.tarifa from asociado_con as ID NATURAL JOIN ubicaciones as U where ID.legajo ="+legajoInsp;
@@ -151,7 +159,8 @@ public class PanelInspector extends JInternalFrame {
 	     				String calle,altura;
 	     				boolean falsisimo = false;
 	     				textPatentes.setEnabled(falsisimo);
-	     				textPatentes.setText("");
+	     				textPatentes.setText("Ingrese las patentes deseadas separadas por un salto de linea (Enter)");
+	     				btnMultas.setEnabled(falsisimo);
 	    				int fila = table_ubicaciones.getSelectedRow();
 	    				calle = table_ubicaciones.getValueAt(fila, 0).toString();
 	    				altura= table_ubicaciones.getValueAt(fila, 1).toString();
@@ -179,33 +188,75 @@ public class PanelInspector extends JInternalFrame {
      			@Override
      			public void mouseClicked(MouseEvent e) {	
      				textPatentes.setEnabled(true);
-     				textPatentes.setText("");
+     				textPatentes.setText("Ingrese las patentes deseadas separadas por un salto de linea (Enter)");
+     				btnMultas.setEnabled(false);
      			}
      		});
  				table_ubicaciones.setEditable(false);
-	     		scrollPane.setViewportView(table_ubicaciones);
+	     		scrollPaneUbicaciones.setViewportView(table_ubicaciones);
 	     		
-	     		JScrollPane scrollPane_1 = new JScrollPane();
-	     		scrollPane_1.setEnabled(true);
-	     		scrollPane_1.setBounds(170, 161, 293, 98);
-	     		getContentPane().add(scrollPane_1);
+	     		JScrollPane scrollPaneParquimetros = new JScrollPane();
+	     		scrollPaneParquimetros.setEnabled(true);
+	     		scrollPaneParquimetros.setBounds(170, 214, 567, 102);
+	     		getContentPane().add(scrollPaneParquimetros);
 	     		
 	     		table_parquimetros.setEditable(false);
-	     		scrollPane_1.setViewportView(table_parquimetros);
+	     		scrollPaneParquimetros.setViewportView(table_parquimetros);
 	     		
 	     		JLabel lblNewLabel_1 = new JLabel("Parquimetros");
 	     		lblNewLabel_1.setFont(new Font("Tahoma", Font.PLAIN, 14));
 	     		lblNewLabel_1.setHorizontalAlignment(SwingConstants.CENTER);
-	     		lblNewLabel_1.setBounds(198, 133, 239, 21);
+	     		lblNewLabel_1.setBounds(170, 182, 567, 21);
 	     		getContentPane().add(lblNewLabel_1);
 	     		
 	     		JLabel lblNewLabel_2 = new JLabel("Ubicaciones");
 	     		lblNewLabel_2.setFont(new Font("Tahoma", Font.PLAIN, 14));
 	     		lblNewLabel_2.setHorizontalAlignment(SwingConstants.CENTER);
-	     		lblNewLabel_2.setBounds(170, 11, 293, 21);
+	     		lblNewLabel_2.setBounds(170, 11, 567, 21);
 	     		getContentPane().add(lblNewLabel_2);
 	     		
+	     		 JScrollPane scrollPaneMultas = new JScrollPane();
+		         scrollPaneMultas.setBounds(10, 361, 764, 198);
+		         getContentPane().add(scrollPaneMultas);
+		         btnMultas.addActionListener(new ActionListener() {
+	                 public void actionPerformed(ActionEvent evt) {
+	                	int columna = table_ubicaciones.getSelectedColumn();
+	                	Calendar calendario = new GregorianCalendar();
+	                	int horaActual, minutos, segundos,ainoActual,mesActual,diaActual;
+	                	ainoActual = calendario.get(Calendar.YEAR);
+	                	mesActual = calendario.get(Calendar.MONTH);
+	                	diaActual = calendario.get(Calendar.DAY_OF_MONTH);
+	                	horaActual =calendario.get(Calendar.HOUR_OF_DAY);
+	                	minutos = calendario.get(Calendar.MINUTE);
+	                	segundos = calendario.get(Calendar.SECOND);
+	                	String fecha = ainoActual+"-"+mesActual+"-"+diaActual;
+	                	String horario = horaActual+":"+minutos+":"+segundos;
+	                	setHoraPrimerMulta();
+	                	String calle = table_ubicaciones.getValueAt(0,columna).toString();
+	                	String altura =table_ubicaciones.getValueAt(1, columna).toString();
+	                	columna = table_parquimetros.getSelectedColumn();
+	                	String id_parq=table_parquimetros.getValueAt(0, columna).toString();
+            	try {
+		                
+                		if(!logica.checkUbicacion(legajoInsp,calle,altura,horaActual,minutos)) {
+	    					JOptionPane.showMessageDialog(null, "Ubicacion no permitida en este horario","Mensaje Error", JOptionPane.WARNING_MESSAGE);
+	                    };
+	                    
+	                    logica.registrarAcceso(legajoInsp,id_parq,fecha,horario);
+	                	logica.generarMultas(legajoInsp,calle,altura,diaActual,horaActual,minutos,patentes);
+	                	String sql_multas="SELECT numero,multa, fecha, hora, calle, altura, patente del auto y legajo del inspector from ";
+	                	Statement st_multas = logica.getConnection().createStatement();
+	                	st_multas.execute(sql_multas);
+	                	ResultSet re_multas=st_multas.getResultSet();
+                	}
+                   	catch (SQLException e) {
+                		// TODO Auto-generated catch block
+                		e.printStackTrace();
+                	}
+	              }
+	           });
 	         }
+	         
 	      } catch (Exception e) {
 	         e.printStackTrace();
 	      }
@@ -220,5 +271,12 @@ public class PanelInspector extends JInternalFrame {
 	      vPrincipal.volverPanelInicial();
 	      logica.desconectar();
 	   }
-
+	   private String setHoraPrimerMulta() {
+		if(horaPrimerMulta!=null || horaPrimerMulta != "")
+			return horaPrimerMulta;
+		DateFormat dateFormat = new SimpleDateFormat("HH:mm");
+       	Date date = new Date();
+       	String horaPrimerMulta=dateFormat.format(date);
+       	return horaPrimerMulta;
+	   }
 }
