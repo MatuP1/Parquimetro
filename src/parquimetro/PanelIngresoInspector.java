@@ -73,6 +73,7 @@ public class PanelIngresoInspector extends JPanel {
 			System.out.println("El pass es: " + pass);
 			if(e.getKeyCode() == KeyEvent.VK_ENTER) {
 				if(logica.checkInspector(user,pass)) { 
+<<<<<<< Updated upstream
 				System.out.println("CheckInspector devolvio true");
 
 				logica.desconectar();
@@ -83,6 +84,14 @@ public class PanelIngresoInspector extends JPanel {
 					JOptionPane.showMessageDialog(null, "Legajo o Contraseña incorrecta","Mensaje Error", JOptionPane.WARNING_MESSAGE);
 				}
 
+=======
+					System.out.println("CheckInspector devolvio true");
+					PanelInspector pi = new PanelInspector(vPrincipal);
+					vPrincipal.cambiarPaneles(pi);
+				}else{
+				  JOptionPane.showMessageDialog(null,"El usuario o la contraseña son incorrectas") ;	
+				}
+>>>>>>> Stashed changes
 			}
 		}
 
