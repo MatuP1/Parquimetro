@@ -52,7 +52,8 @@ public class PanelInspector extends JInternalFrame {
 	private String passInsp;
 	private JTextPane textPatentes;
 	private String[] patentes;
-	private String horaPrimerMulta;
+	private int horaPrimerMulta = 0;
+	private int minutosPrimerMulta = 0;
 	
 	public PanelInspector(PrincipalWindow v, String legajo, String pass) {
 		vPrincipal = v;
@@ -130,7 +131,7 @@ public class PanelInspector extends JInternalFrame {
 	     		JScrollPane scrollPaneUbicaciones = new JScrollPane();
 	     		table_parquimetros = new DBTable();
 	     		table_ubicaciones= new DBTable();
-	     		
+	     		multas =new DBTable();
 	     		scrollPaneUbicaciones.setEnabled(true);
 	     		scrollPaneUbicaciones.setBounds(170, 34, 567, 137);
 	     		getContentPane().add(scrollPaneUbicaciones);
@@ -220,7 +221,7 @@ public class PanelInspector extends JInternalFrame {
 		         getContentPane().add(scrollPaneMultas);
 		         btnMultas.addActionListener(new ActionListener() {
 	                 public void actionPerformed(ActionEvent evt) {
-	                	int columna = table_ubicaciones.getSelectedColumn();
+	                	int fila = table_ubicaciones.getSelectedRow();
 	                	Calendar calendario = new GregorianCalendar();
 	                	int horaActual, minutos, segundos,ainoActual,mesActual,diaActual;
 	                	ainoActual = calendario.get(Calendar.YEAR);
@@ -231,23 +232,37 @@ public class PanelInspector extends JInternalFrame {
 	                	segundos = calendario.get(Calendar.SECOND);
 	                	String fecha = ainoActual+"-"+mesActual+"-"+diaActual;
 	                	String horario = horaActual+":"+minutos+":"+segundos;
-	                	setHoraPrimerMulta();
-	                	String calle = table_ubicaciones.getValueAt(0,columna).toString();
-	                	String altura =table_ubicaciones.getValueAt(1, columna).toString();
-	                	columna = table_parquimetros.getSelectedColumn();
-	                	String id_parq=table_parquimetros.getValueAt(0, columna).toString();
+	                	setHoraPrimerMulta(horaActual,minutos);
+	                	String calle = table_ubicaciones.getValueAt(fila,0).toString();
+	                	String altura =table_ubicaciones.getValueAt(fila,1).toString();
+	                	fila = table_parquimetros.getSelectedRow();
+	                	String id_parq=table_parquimetros.getValueAt(fila, 0).toString();
             	try {
 		                
                 		if(!logica.checkUbicacion(legajoInsp,calle,altura,horaActual,minutos)) {
 	    					JOptionPane.showMessageDialog(null, "Ubicacion no permitida en este horario","Mensaje Error", JOptionPane.WARNING_MESSAGE);
-	                    };
-	                    
-	                    logica.registrarAcceso(legajoInsp,id_parq,fecha,horario);
-	                	logica.generarMultas(legajoInsp,calle,altura,diaActual,horaActual,minutos,patentes);
-	                	String sql_multas="SELECT numero,multa, fecha, hora, calle, altura, patente del auto y legajo del inspector from ";
-	                	Statement st_multas = logica.getConnection().createStatement();
-	                	st_multas.execute(sql_multas);
-	                	ResultSet re_multas=st_multas.getResultSet();
+	                    }
+	                    else {
+		                    logica.registrarAcceso(legajoInsp,id_parq,fecha,horario);
+		                	logica.generarMultas(legajoInsp,calle,altura,fecha,horario,patentes);
+		                	String sql_multas="SELECT M.numero, M.fecha, M.hora, AC.calle, AC.altura, M.patente, AC.legajo from multa as M NATURAL JOIN asociado_con as AC WHERE ("+horaActual+" > "+horaPrimerMulta+" OR ("+horaActual+"="+horaPrimerMulta+" AND "+minutos+">="+minutosPrimerMulta+"));";
+		                	Statement st_multas = logica.getConnection().createStatement();
+		                	st_multas.execute(sql_multas);
+		                	ResultSet rs_multas=st_multas.getResultSet();
+		                	multas.refresh(rs_multas);
+		                	 for (int i = 0; i < multas.getColumnCount(); i++)
+		               	  { // para que muestre correctamente los valores de tipo TIME (hora)  		   		  
+		               		 if	 (multas.getColumn(i).getType()==Types.TIME)  
+		               		 {    		 
+		               		    multas.getColumn(i).setType(Types.CHAR);  
+		             	       	 }
+		               		 // cambiar el formato en que se muestran los valores de tipo DATE
+		               		 if	 (multas.getColumn(i).getType()==Types.DATE)
+		               		 {
+		               		    multas.getColumn(i).setDateFormat("dd/MM/YYYY");
+		               		 }
+		                    }  
+	                    }
                 	}
                    	catch (SQLException e) {
                 		// TODO Auto-generated catch block
@@ -255,6 +270,7 @@ public class PanelInspector extends JInternalFrame {
                 	}
 	              }
 	           });
+		     scrollPaneMultas.setViewportView(multas);   
 	         }
 	         
 	      } catch (Exception e) {
@@ -271,12 +287,10 @@ public class PanelInspector extends JInternalFrame {
 	      vPrincipal.volverPanelInicial();
 	      logica.desconectar();
 	   }
-	   private String setHoraPrimerMulta() {
-		if(horaPrimerMulta!=null || horaPrimerMulta != "")
-			return horaPrimerMulta;
-		DateFormat dateFormat = new SimpleDateFormat("HH:mm");
-       	Date date = new Date();
-       	String horaPrimerMulta=dateFormat.format(date);
-       	return horaPrimerMulta;
-	   }
+	   private void setHoraPrimerMulta(int hora, int minutos) {
+		   if(horaPrimerMulta != 0) {
+			   horaPrimerMulta = hora;
+			   minutosPrimerMulta = minutos;
+		   }
+       }
 }

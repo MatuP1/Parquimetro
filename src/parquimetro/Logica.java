@@ -179,7 +179,8 @@ public class Logica {
 			turno ="t";
 		}
 		try {
-			ResultSet rs = cnx.createStatement().executeQuery("SELECT AD.legajo FROM asociado_con as AD where turno ="+turno+" AND dia="+dia+" AND calle="+calle+" AND altura="+altura+" AND legajo="+legajo+";");
+			System.out.println(turno+"   "+calle+"    "+altura+"    "+dia+"   "+legajo);
+			ResultSet rs = cnx.createStatement().executeQuery("SELECT AD.legajo FROM asociado_con as AD where turno ="+"\""+turno+"\""+" AND dia="+"\""+dia+"\""+" AND calle="+"\""+calle+"\""+" AND altura="+altura+" AND legajo="+legajo+";");
 			if (rs.next())
 				pertenece=true;
 		} catch (SQLException ex) {
@@ -205,7 +206,7 @@ public class Logica {
 	   }
 	public void registrarAcceso(String legajoInsp, String id_parq, String fecha, String horario) {
 		try {
-			cnx.createStatement().execute("INSERT INTO accede VALUES("+legajoInsp+","+id_parq+","+fecha+","+horario+");");
+			cnx.createStatement().execute("INSERT INTO accede VALUES("+legajoInsp+","+id_parq+","+"\""+fecha+"\""+","+"\""+horario+"\""+");");
 		} catch (SQLException ex) {
 			   System.out.println("SQLException: " + ex.getMessage());
 	            System.out.println("SQLState: " + ex.getSQLState());
@@ -213,19 +214,55 @@ public class Logica {
 		}
 		
 	}
-	public void generarMultas(String legajoInsp, String calle, String altura, int diaActual, int horaActual,int minutos, String[] patentes) {
+	public boolean generarMultas(String legajoInsp, String calle, String altura, String fecha,String horario, String[] patentes) {
 		//Primero hay que checkear que las patentes esten el la base de datos
-		
+		boolean correcto=true;
 		String [] patentesValidas = new String[patentes.length];
 		int j=0;
 		try {
 			for(int i=0; i<patentes.length;i++) {
-				ResultSet rs = cnx.createStatement().executeQuery("SELECT A.patente FROM automoviles where A.patente="+patentes[i]);
+				ResultSet rs = cnx.createStatement().executeQuery("SELECT DISTINCT A.patente FROM tarjetas as A where A.patente="+"\""+patentes[i]+"\""+";");
 				if(rs.next()) {
 					patentesValidas[j]=patentes[i];
 					j++;
 				}
+				else
+					correcto = false;
 			}
+		ResultSet rs_autosEstacionados = cnx.createStatement().executeQuery("SELECT T.patente FROM tarjetas as T NATURAL JOIN estacionados as E NATURAL JOIN parquimetros as P WHERE p.calle="+"\""+calle+"\""+" AND p.altura="+altura+";");
+		String patenteActual="";
+		int i=0;
+		Calendar calendario = new GregorianCalendar();
+		String turno="";
+		int hora =calendario.get(Calendar.HOUR_OF_DAY);
+    	int minutos = calendario.get(Calendar.MINUTE);
+		String [] semana = {"do","lu","ma","mi","ju","vi","sa"};
+		String dia=semana[calendario.get(Calendar.DAY_OF_WEEK)-1];
+		if(hora>7 && hora<14) {
+			turno ="m";
+		}
+		if(hora>=14 && (hora<20 || (hora==20 && minutos==00))) {
+			turno ="t";
+		}
+		ResultSet rs_aux=cnx.createStatement().executeQuery("Select A.id_asociado_con FROM asociado_con as A WHERE legajo="+legajoInsp+" AND calle="+"\""+calle+"\""+" AND altura="+altura+" AND dia="+"\""+dia+"\""+" AND turno="+"\""+turno+"\""+";");
+		int id_asociado=0;
+		if(rs_aux.next())
+			id_asociado=rs_aux.getInt(1);
+		while(rs_autosEstacionados.next()) {	
+			patenteActual=rs_autosEstacionados.getString(1);
+			boolean esta=false;
+			i=0;
+			while(!esta && i<patentesValidas.length && patentesValidas[i]!=null && patentesValidas[i]!="" ) {
+				if(patentesValidas[i] == patenteActual) {
+					esta = true;
+				}
+			}
+			if(!esta) {
+				cnx.createStatement().execute("INSERT INTO multa(fecha,hora,patente,id_asociado_con) VALUES("+fecha+","+"\""+horario+"\""+","+"\""+patenteActual+"\""+","+id_asociado+");");
+			}
+		}
+		
+		
 		} catch (SQLException ex) {
 			   System.out.println("SQLException: " + ex.getMessage());
 	           System.out.println("SQLState: " + ex.getSQLState());
@@ -235,7 +272,7 @@ public class Logica {
 		//Las patentes que esten en la base de datos hay que generales multas sino tienen un estacionamiento abierto
 		
 		
-		
+		return correcto;
 	}
 
 }
