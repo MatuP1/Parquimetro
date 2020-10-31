@@ -1,7 +1,6 @@
 package parquimetro;
 
 import javax.swing.JPanel;
-import javax.swing.SwingUtilities;
 import javax.swing.JFrame;
 import javax.swing.JInternalFrame;
 
@@ -20,17 +19,9 @@ public class PrincipalWindow extends JFrame{
 	 * Launch the application.
 	 */
 	public static void main(String[] args) {
-		SwingUtilities.invokeLater(new Runnable() {
-			public void run() {
-				try {
-					PrincipalWindow frame = new PrincipalWindow();
-					frame.setVisible(true);
-				} catch (Exception e) {
-					e.printStackTrace();
-				}
-			}
-		});
-	}
+		PrincipalWindow frame = new PrincipalWindow();
+		frame.setVisible(true);
+	};
 	
 	
 	public PrincipalWindow() {
