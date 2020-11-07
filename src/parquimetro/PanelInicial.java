@@ -44,9 +44,9 @@ public class PanelInicial extends JPanel {
 	
 	
 	private class OyenteAdmin implements ActionListener {
-		public void actionPerformed(ActionEvent e) {	
+		public void actionPerformed(ActionEvent e) {
 				PanelIngresoAdmin pia = new PanelIngresoAdmin(vPrincipal);
-				vPrincipal.cambiarPaneles(pia);
+				vPrincipal.cambiarFrame(pia);
 			}
 		}
 	
@@ -54,7 +54,7 @@ public class PanelInicial extends JPanel {
 		public void actionPerformed(ActionEvent e) {
 				vPrincipal.getLogica().connectAdmin("admin");
 				PanelIngresoInspector pii = new PanelIngresoInspector(vPrincipal);
-				vPrincipal.cambiarPaneles(pii);
+				vPrincipal.cambiarFrame(pii);
 			}
 		}
 	

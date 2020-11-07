@@ -1,46 +1,72 @@
 package parquimetro;
+import javax.swing.JTextField;
+import javax.swing.WindowConstants;
 
-import javax.swing.JPanel;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
-import java.awt.event.KeyEvent;
-import java.awt.event.KeyListener;
-import java.awt.GridBagLayout;
+import java.awt.BorderLayout;
+import java.awt.Dimension;
 
 import javax.swing.JPasswordField;
-import javax.swing.JButton;
 import javax.swing.JLabel;
+import javax.swing.JOptionPane;
+import javax.swing.JButton;
+import java.awt.event.ActionListener;
+import java.awt.event.ComponentAdapter;
+import java.awt.event.ComponentEvent;
+import java.awt.event.ActionEvent;
 
-public class PanelIngresoAdmin extends JPanel{
+public class PanelIngresoAdmin extends javax.swing.JInternalFrame{
 	private static final long serialVersionUID = 1L;
 	
 	private PrincipalWindow vPrincipal;
 	private Logica logica;
 	private int Ancho,Alto;
-	private String pass;
 	private JPasswordField passwordField;
-
 	
 	public PanelIngresoAdmin(PrincipalWindow v) {
 		vPrincipal = v;
 		Ancho = v.getAncho();
 		Alto = v.getAlto();
+		logica =v.getLogica();
 		
+         setVisible(true);
+         this.setTitle("Ingreso Administrador");
+         this.setClosable(false);
+         this.setMaximizable(false);
+         this.addComponentListener(new ComponentAdapter() {
+            public void componentHidden(ComponentEvent evt) {
+               thisComponentHidden(evt);
+            }
+            public void componentShown(ComponentEvent evt) {
+               thisComponentShown(evt);
+            }
+         });
 		
 		this.setBounds(0, 0, Ancho, Alto);
-		this.setLayout(new GridBagLayout());
-		logica = vPrincipal.getLogica();		
-		JPanel panel = new JPanel();
-		OyentePass LPass = new OyentePass();
-		panel.setBounds(0, 0, 200, 200);
+		getContentPane().setLayout(null);
 		
-		passwordField = new JPasswordField(30);
-		passwordField.addKeyListener(LPass);
+		passwordField = new JPasswordField();
+		passwordField.setBounds(206, 360, 385, 20);
+		getContentPane().add(passwordField);
 		
-		JLabel labelIngreso = new JLabel("Ingrese su contraseña");
+		JLabel lblNewLabel = new JLabel("Ingrese su Contraseña");
+		lblNewLabel.setBounds(60, 363, 136, 14);
+		getContentPane().add(lblNewLabel);
 		
-		panel.add(labelIngreso);
-		panel.add(passwordField);
+		JButton btnIngresar = new JButton("Ingresar");
+		btnIngresar.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent arg0) {
+				String pass = new String(passwordField.getPassword());
+				if(logica.checkAdmin(pass)) {
+					logica.connectAdmin(pass);
+					ConsultasAdmin ca = new ConsultasAdmin(vPrincipal);
+					vPrincipal.cambiarFrame(ca);
+				}else {
+					JOptionPane.showMessageDialog(null, "Contraseña incorrecta. Ingrese la contraseña nuevamente","Mensaje Error", JOptionPane.WARNING_MESSAGE);
+				}
+			}
+		});
+		btnIngresar.setBounds(484, 409, 89, 23);
+		getContentPane().add(btnIngresar);
 		
 		JButton btnBack = new JButton("Volver al Inicio");
 		btnBack.addActionListener(new ActionListener() {
@@ -48,32 +74,14 @@ public class PanelIngresoAdmin extends JPanel{
                vPrincipal.volverPanelInicial();
             }
          });
-		
-		this.add(panel);
-		this.add(btnBack);
+		btnBack.setBounds(220, 409, 120, 23);
+		getContentPane().add(btnBack);
 	}
 	
-	
-	private class OyentePass implements KeyListener{
-		@Override
-		public void keyPressed(KeyEvent e) {
-			pass = new String(passwordField.getPassword());
-			if(e.getKeyCode() == KeyEvent.VK_ENTER && logica.checkAdmin(pass)) {
-				logica.connectAdmin(pass);
-				ConsultasAdmin ca = new ConsultasAdmin(vPrincipal);
-				vPrincipal.cambiarFrame(ca);
-			}
-		}
-
-		@Override
-		public void keyReleased(KeyEvent arg0) {
-		}
-
-		@Override
-		public void keyTyped(KeyEvent arg0) {
-		}
-		
+	private void thisComponentShown(ComponentEvent evt) {
 	}
+	   
+	private void thisComponentHidden(ComponentEvent evt) {
 	
-
+	}
 }

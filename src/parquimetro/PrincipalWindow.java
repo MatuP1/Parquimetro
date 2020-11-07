@@ -22,12 +22,10 @@ public class PrincipalWindow extends JFrame{
 	public static void main(String[] args) {
 		SwingUtilities.invokeLater(new Runnable() {
 			public void run() {
-				try {
 					PrincipalWindow frame = new PrincipalWindow();
+					frame.setLocationRelativeTo(null);
 					frame.setVisible(true);
-				} catch (Exception e) {
-					e.printStackTrace();
-				}
+
 			}
 		});
 	}
