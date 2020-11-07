@@ -19,14 +19,9 @@ public class PrincipalWindow extends JFrame{
 	 * Launch the application.
 	 */
 	public static void main(String[] args) {
-		SwingUtilities.invokeLater(new Runnable() {
-			public void run() {
-					PrincipalWindow frame = new PrincipalWindow();
-					frame.setLocationRelativeTo(null);
-					frame.setVisible(true);
+		PrincipalWindow frame = new PrincipalWindow();
+		frame.setVisible(true);
 
-			}
-		});
 	}
 
 	public PrincipalWindow() {
