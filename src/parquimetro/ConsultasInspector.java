@@ -14,10 +14,11 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
 import java.sql.Types;
-
+import java.text.ParseException;
 import java.util.Calendar;
 import java.util.GregorianCalendar;
 
+import javax.swing.DefaultListModel;
 import javax.swing.JButton;
 import javax.swing.JFormattedTextField;
 import javax.swing.JInternalFrame;
@@ -34,6 +35,7 @@ import javax.swing.WindowConstants;
 import javax.swing.text.MaskFormatter;
 
 import quick.dbtable.DBTable;
+import javax.swing.JList;
 
 public class ConsultasInspector extends JInternalFrame {
 	
@@ -45,7 +47,9 @@ public class ConsultasInspector extends JInternalFrame {
 	private DBTable table_parquimetros;
 	private String legajoInsp;
 	private JFormattedTextField textPatentes;
+	DefaultListModel listaPatentes;
 	private String[] patentes;
+	private int cant_patentes = 0;
 	private int horaPrimerMulta = 0;
 	private int minutosPrimerMulta = 0;
 	
@@ -54,6 +58,7 @@ public class ConsultasInspector extends JInternalFrame {
 		legajoInsp = legajo;
 		logica = v.getLogica();
 		multas = logica.connectInspector("inspector");
+		patentes = new String[logica.getPatentes()];
 		initGUI();
 		
 	}
@@ -85,9 +90,15 @@ public class ConsultasInspector extends JInternalFrame {
 	     		btnPatentes.addActionListener(new ActionListener() {
 	                  public void actionPerformed(ActionEvent evt) {
 	                	  btnMultas.setEnabled(true);
-	                	  patentes = textPatentes.getText().split("\n");
-	                	  textPatentes.setText("Se ingresaron las patentes correctamente, si desea ingresar mas patentes destruya este texto");
-	                  }
+	                	  String pat_actual;
+	                	  btnPatentes.setEnabled(false);
+	                	  pat_actual = textPatentes.getText();
+	  			          listaPatentes.addElement(pat_actual);
+	  			          textPatentes.setText("");
+	                	  patentes[cant_patentes] = pat_actual;
+	                	  cant_patentes++;
+	                	  textPatentes.setValue(null);
+	           }
 	            });
 	     		btnPatentes.setEnabled(false);
 	     		btnPatentes.setFont(new Font("Tahoma", Font.PLAIN, 12));
@@ -103,14 +114,16 @@ public class ConsultasInspector extends JInternalFrame {
 	     		
 	     		btnMultas.setEnabled(false);
 	     		btnMultas.setFont(new Font("Tahoma", Font.PLAIN, 14));
-	     		btnMultas.setBounds(10, 327, 764, 23);
+	     		btnMultas.setBounds(170, 327, 604, 23);
 	     		getContentPane().add(btnMultas);
 	     		
 	        	
 	     		textPatentes.addKeyListener(new KeyAdapter() {
 	     			@Override
-	     			public void keyTyped(KeyEvent e) {
-	     				btnPatentes.setEnabled(true);
+	     			public void keyReleased(KeyEvent e) {
+	     				if(textPatentes.getValue()!=null)
+	     					btnPatentes.setEnabled(true);
+	     				System.out.println(textPatentes.getText());
 	     			}
 	     		});
 	     		textPatentes.setBounds(10, 34, 137, 200);
@@ -209,10 +222,13 @@ public class ConsultasInspector extends JInternalFrame {
 	     		getContentPane().add(lblNewLabel_2);
 	     		
 	     		 JScrollPane scrollPaneMultas = new JScrollPane();
-		         scrollPaneMultas.setBounds(10, 361, 764, 198);
+		         scrollPaneMultas.setBounds(170, 361, 604, 198);
 		         getContentPane().add(scrollPaneMultas);
 		         btnMultas.addActionListener(new ActionListener() {
 	                 public void actionPerformed(ActionEvent evt) {
+	                	cant_patentes = 0;
+	                	btnPatentes.setEnabled(false);
+	                	textPatentes.setValue(null);
 	                	int fila = table_ubicaciones.getSelectedRow();
 	                	Calendar calendario = new GregorianCalendar();
 	                	int horaActual, minutos, segundos,ainoActual,mesActual,diaActual;
@@ -240,6 +256,7 @@ public class ConsultasInspector extends JInternalFrame {
 		                	if(!multasgeneradas) {
 		                		JOptionPane.showMessageDialog(null, "Hay patentes que no pertenecen a la base de datos","Mensaje Error", JOptionPane.WARNING_MESSAGE);
 		                	}
+		                	patentes = new String[logica.getPatentes()];
 		                	String sql_multas="SELECT M.numero, M.fecha, M.hora, AC.calle, AC.altura, M.patente, AC.legajo from multa as M NATURAL JOIN asociado_con as AC WHERE ("+horaActual+" > "+horaPrimerMulta+" OR ("+horaActual+"="+horaPrimerMulta+" AND "+minutos+">="+minutosPrimerMulta+")) AND M.fecha ="+"\""+fecha+"\""+" AND AC.legajo ="+legajoInsp+";";
 		                	Statement st_multas = logica.getConnection().createStatement();
 		                	st_multas.execute(sql_multas);
@@ -267,6 +284,19 @@ public class ConsultasInspector extends JInternalFrame {
 	           });
 		     scrollPaneMultas.setViewportView(multas);   
 	         }
+	         
+	         JScrollPane scrollPane = new JScrollPane();
+	         scrollPane.setBounds(10, 361, 137, 198);
+	         getContentPane().add(scrollPane);
+	         
+	         listaPatentes = new DefaultListModel();
+	         JList list = new JList(listaPatentes);
+	         scrollPane.setViewportView(list);
+	         
+	         JLabel lblListaPatentes = new JLabel("Lista Patentes");
+	         lblListaPatentes.setHorizontalAlignment(SwingConstants.CENTER);
+	         lblListaPatentes.setBounds(10, 327, 137, 23);
+	         getContentPane().add(lblListaPatentes);
 	         
 	      } catch (Exception e) {
 	         e.printStackTrace();

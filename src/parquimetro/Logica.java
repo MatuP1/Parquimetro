@@ -257,7 +257,8 @@ public class Logica {
 		
 		if(!hayautos) { //Si no hay autos estacionados, genera multas a todos los autos registrados por el inspector
 			for(int cont=0; cont<cantPatentesValidas;cont++) {
-				cnx.createStatement().execute("INSERT INTO multa(fecha,hora,patente,id_asociado_con) VALUES("+"\""+fecha+"\""+","+"\""+horario+"\""+","+"\""+patentesValidas[cont]+"\""+","+id_asociado+");");	
+				String patente=patentesValidas[cont].toUpperCase();
+				cnx.createStatement().execute("INSERT INTO multa(fecha,hora,patente,id_asociado_con) VALUES("+"\""+fecha+"\""+","+"\""+horario+"\""+","+"\""+patente+"\""+","+id_asociado+");");	
 			}
 		}
 		i=0;
@@ -288,6 +289,22 @@ public class Logica {
 		}
 
 		return correcto;
+	}
+	public int getPatentes() {
+		int patentes = 0;
+		ResultSet rs_aux;
+		if(tabla!=null) {
+			try {
+				rs_aux=cnx.createStatement(ResultSet.TYPE_SCROLL_SENSITIVE,ResultSet.CONCUR_READ_ONLY).executeQuery("Select distinct patente from tarjetas");
+				rs_aux.last();
+				patentes = rs_aux.getRow();
+				System.out.println("La cantidad de patenes tiene que ser 9 y es: "+patentes);
+			} catch (SQLException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+		}
+		return patentes;
 	}
 
 }
