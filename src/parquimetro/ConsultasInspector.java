@@ -64,7 +64,7 @@ public class ConsultasInspector extends JInternalFrame {
 	         setPreferredSize(new Dimension(800, 600));
 	         this.setBounds(0, 0, 800, 600);
 	         setVisible(true);
-	         this.setTitle("Consultas (Utilizando DBTable)");
+	         this.setTitle("Consultas Inspector");
 	         this.setClosable(true);
 	         this.setDefaultCloseOperation(WindowConstants.HIDE_ON_CLOSE);
 	         this.setMaximizable(true);
