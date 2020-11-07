@@ -1,7 +1,6 @@
 package parquimetro;
 
 import javax.swing.JPanel;
-import javax.swing.SwingUtilities;
 import javax.swing.JFrame;
 import javax.swing.JInternalFrame;
 
@@ -29,8 +28,7 @@ public class PrincipalWindow extends JFrame{
 			}
 		});
 	}
-	
-	
+
 	public PrincipalWindow() {
 		
 		super("Parquimetros");
