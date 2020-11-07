@@ -19,6 +19,7 @@ import java.util.Calendar;
 import java.util.GregorianCalendar;
 
 import javax.swing.JButton;
+import javax.swing.JFormattedTextField;
 import javax.swing.JInternalFrame;
 import javax.swing.JLabel;
 
@@ -27,11 +28,10 @@ import javax.swing.JOptionPane;
 import javax.swing.JScrollPane;
 import javax.swing.JSeparator;
 
-import javax.swing.JTextPane;
 import javax.swing.SwingConstants;
 import javax.swing.SwingUtilities;
 import javax.swing.WindowConstants;
-
+import javax.swing.text.MaskFormatter;
 
 import quick.dbtable.DBTable;
 
@@ -44,7 +44,7 @@ public class ConsultasInspector extends JInternalFrame {
 	private DBTable table_ubicaciones;
 	private DBTable table_parquimetros;
 	private String legajoInsp;
-	private JTextPane textPatentes;
+	private JFormattedTextField textPatentes;
 	private String[] patentes;
 	private int horaPrimerMulta = 0;
 	private int minutosPrimerMulta = 0;
@@ -79,7 +79,8 @@ public class ConsultasInspector extends JInternalFrame {
 	         getContentPane().setLayout(null);
 	         {
 		     	JButton btnMultas = new JButton("Generar Multas");
-		     	textPatentes = new JTextPane();
+		     	MaskFormatter pat_mask = new MaskFormatter("LLL###");
+		     	textPatentes = new JFormattedTextField(pat_mask);
 	     		JButton btnPatentes = new JButton("Ingresar Patentes");
 	     		btnPatentes.addActionListener(new ActionListener() {
 	                  public void actionPerformed(ActionEvent evt) {
