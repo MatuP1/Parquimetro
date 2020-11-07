@@ -32,7 +32,7 @@ public class PanelIngresoInspector extends javax.swing.JInternalFrame {
 		
 		this.setBounds(0, 0, Ancho, Alto);
         setVisible(true);
-        this.setTitle("Ingreso Inspector)");
+        this.setTitle("Ingreso Inspector");
         this.setClosable(false);
         this.setMaximizable(false);
         getContentPane().setLayout(null);
