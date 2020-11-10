@@ -224,12 +224,14 @@ public class Logica {
 			int j=0;
 			for(int i=0; i<patentes.length;i++) {
 				ResultSet rs = cnx.createStatement().executeQuery("SELECT DISTINCT A.patente FROM tarjetas as A where A.patente="+"\""+patentes[i]+"\""+";");
-				if(rs.next()) {
-					patentesValidas[j]=patentes[i];
-					j++;
-				}
-				else {
-					correcto = false;
+				if(patentes[i]!=null) {
+					if(rs.next()) {
+						patentesValidas[j]=patentes[i];
+						j++;
+					}
+					else {
+						correcto = false;
+					}
 				}
 			}
 		int cantPatentesValidas = j;
