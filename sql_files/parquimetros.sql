@@ -105,8 +105,7 @@ CREATE TABLE accede (
 	legajo INT unsigned NOT NULL,
 	id_parq SMALLINT unsigned NOT NULL,
 	fecha DATE NOT NULL, 
-	hora TIME (0) NOT NULL,
-	
+	hora TIME (0) NOT NULL,	
 	CONSTRAINT pk_accede
 	PRIMARY KEY (id_parq,fecha,hora),
 	
@@ -180,7 +179,45 @@ CREATE TABLE ventas(
 	FOREIGN KEY (saldo) REFERENCES tarjetas (saldo)
 		ON DELETE RESTRICT ON UPDATE CASCADE
 )ENGINE=InnoDB;
+#-------------------------------------------------------------------------------------------------------------------------------------
+delimiter !
+CREATE PROCEDURE conectar(IN id_tarjeta INTEGER , IN id_parq INTEGER)
+begin
+	START TRANSACTION;
+	DECLARE op_t VARCHAR(8);
+	DECLARE op_r VARCHAR(4);
+	DECLARE est_time INTEGER;
+	DECLARE operacion BOOLEAN;
+	SELECT true INTO operacion FROM tarjetas AS t NATURAL JOIN estacionamientos AS e
+							   WHERE t.id_tarjeta = id_tarjeta AND e.fecha_sal != NULL;
 
+	IF operacion THEN
+		DECLARE sal INTEGER;
+		DECLARE descuento INTEGER
+		DECLARE tarifa INTEGER  
+		SET op_t="apertura";
+
+		SELECT true INTO operacion FROM tarjetas AS t WHERE t.id_tarjeta = id_tarjeta AND t.saldo > 0;
+		SELECT u.tarifa INTO tarifa FROM parquimetro AS p NATURAL JOIN ubicaciones AS u
+									WHERE p.calle = u.calle AND p.altura = u.altura;
+		SELECT t.saldo INTO sal FROM tarjetas AS t WHERE t.id_tarjeta = id_tarjeta;
+		SELECT tt.descuento INTO descuento FROM tarjetas NATURAL JOIN tipos_tarjeta AS tt WHERE t.id_tarjeta = id_tarjeta;
+		IF operacion THEN
+			SET op_r = "Ok";
+			SET est_time = (sal/(tarifa*(1-descuento))); 
+			INSERT estacionamientos	
+		ELSE
+			SET op_r = "Fail";
+		END IF;
+	ELSE
+		SET op_t="cierre";
+		SET op_r="Ok";
+	END IF;
+
+	SELECT op_t AS "Tipo de Operacion", op_r AS "Resultado de la operacion", est_time AS "Tiempo Restante Maximo";
+	COMMIT;
+end; !
+delimiter ;
 #-------------------------------------------------------------------------------------------------------------------------------------
 CREATE VIEW estacionados AS
 SELECT p.calle,p.altura,t.patente 
