@@ -15,6 +15,7 @@ public class PanelInicial extends JPanel {
 	static final String lblUsuarioString = "Elija un Usuario";
 	static final String btnAdminString = "Admin";
 	static final String btnInspectorString = "Inspector";
+	static final String btnUsuarioString = "Usuario";
 	
 	private PrincipalWindow vPrincipal;
 	
@@ -40,6 +41,12 @@ public class PanelInicial extends JPanel {
 		btnInspector.addActionListener(LInspector);
 		this.add(btnInspector);
 		
+		OyenteUsuario LUsuario = new OyenteUsuario();
+		
+		JButton btnUsuario = new JButton(btnUsuarioString);
+		btnUsuario.addActionListener(LUsuario);
+		this.add(btnUsuario);
+		
 	}
 	
 	
@@ -55,6 +62,14 @@ public class PanelInicial extends JPanel {
 				vPrincipal.getLogica().connectAdmin("admin");
 				PanelIngresoInspector pii = new PanelIngresoInspector(vPrincipal);
 				vPrincipal.cambiarFrame(pii);
+			}
+		}
+	
+	private class OyenteUsuario implements ActionListener {
+		public void actionPerformed(ActionEvent e) {
+				vPrincipal.getLogica().connectAdmin("admin");
+				PanelIngresoUsuario piu = new PanelIngresoUsuario(vPrincipal);
+				vPrincipal.cambiarFrame(piu);
 			}
 		}
 	
