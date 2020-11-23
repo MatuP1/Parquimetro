@@ -185,8 +185,8 @@ begin
 	DECLARE op_t VARCHAR(8);
 	DECLARE op_r VARCHAR(4);
 	DECLARE est_time INTEGER;
-	DECLARE operacion BOOLEAN DEFAULT 0;
-	DECLARE sal INTEGER;
+	DECLARE operacion BOOLEAN DEFAULT false;
+	DECLARE sal INTEGER DEFAULT 0;
 	DECLARE descuento INTEGER;
 	DECLARE tarifa INTEGER;
 	DECLARE hora_ini TIME;
@@ -195,37 +195,40 @@ begin
 	DECLARE fecha_fin DATE;
 	
 	START TRANSACTION;
-	SELECT true INTO operacion FROM tarjetas AS t NATURAL JOIN estacionamientos AS e WHERE t.id_tarjeta = id_t AND e.fecha_sal IS NOT NULL;
+	SELECT true INTO operacion FROM tarjetas AS t NATURAL JOIN estacionamientos AS e 
+			WHERE t.id_tarjeta = id_t AND e.fecha_sal IS NULL;
 	SELECT t.saldo INTO sal FROM tarjetas AS t WHERE t.id_tarjeta = id_t;
-	SELECT tt.descuento INTO descuento FROM tarjetas AS t NATURAL JOIN tipos_tarjeta AS tt WHERE t.id_tarjeta = id_t;
-	SELECT u.tarifa INTO tarifa FROM parquimetro AS p NATURAL JOIN ubicaciones AS u
-									WHERE p.calle = u.calle AND p.altura = u.altura;
-	SELECT t.saldo INTO sal FROM tarjetas AS t WHERE t.id_tarjeta = id_t;
-	SELECT tt.descuento INTO descuento FROM tarjetas AS t NATURAL JOIN tipos_tarjeta AS tt WHERE t.id_tarjeta = id_t;
-			
+	SELECT u.tarifa INTO tarifa FROM parquimetros AS p NATURAL JOIN ubicaciones AS u
+			WHERE p.id_parq = id_p AND p.calle = u.calle AND p.altura = u.altura;
+	SELECT tt.descuento INTO descuento FROM tarjetas AS t NATURAL JOIN tipos_tarjeta AS tt 
+			WHERE t.id_tarjeta = id_t;
 	IF operacion THEN
-		
+		SET op_t="cierre";
+		SET op_r = "Ok";
+		SET fecha_fin = curdate();
+		SET hora_fin = curtime();
+		SELECT e.fecha_ent INTO fecha_ini FROM estacionamientos AS e WHERE e.id_tarjeta=id_t AND e.id_parq = id_p;
+		SELECT e.hora_ent INTO hora_ini FROM estacionamientos AS e WHERE e.id_tarjeta=id_t AND e.id_parq = id_p; 
+		UPDATE estacionamientos SET fecha_sal = fecha_fin;
+		UPDATE estacionamientos SET hora_sal = hora_fin;
+		SET est_time = ((fecha_fin+0)-(fecha_ini+0)*1440) + (((hora_fin+0)-(hora_ini+0)+24)%24);
+		SET sal = sal-((tarifa*(1-descuento))*ROUND(est_time/60));
+		IF sal IS NULL OR sal<(-999)THEN
+			SET sal = -900;
+		END IF;
+		UPDATE tarjetas SET saldo = sal;
+	ELSE		
 		SET op_t="apertura";
-
+		SET operacion = false;
 		SELECT true INTO operacion FROM tarjetas AS t WHERE t.id_tarjeta = id_t AND t.saldo > 0;
 		IF operacion THEN
 			SET op_r = "Ok";
 			SET est_time = (sal/(tarifa*(1-descuento))); 
 			INSERT INTO estacionamientos(id_tarjeta,id_parq,fecha_ent,hora_ent) VALUES(id_t,id_p,curdate(),curtime());
+		#posible rollback por mas de un estacionamieto abierot
 		ELSE
 			SET op_r = "Fail";
-		END IF;
-	ELSE
-		SET op_t="cierre";
-		
-		SET fecha_fin = curdate();
-		SET hora_fin = curtime();
-		SELECT t.fecha_ent INTO fecha_ini FROM tarjetas AS t WHERE t.id_tarjeta=id_t;
-		SELECT t.hora_ent INTO hora_ini FROM tarjetas AS t WHERE t.id_tarjeta=id_t; 
-		UPDATE INTO estacionamientos VALUES(id_t,id_p,fecha_ini,hora_ini,fecha_fin,hora_fin);
-		SET est_time = ((fecha_fin+0)-(fecha_ini+0)*1440) + (((hora_fin+0)-(hora_ini+0)+24)%24);
-		SET sal = sal-((tarifa*(1-descuento))*ROUND(est_time/60));
-		#UPDATE saldo de la tarjetas
+		END IF;	
 	END IF;
 
 	SELECT op_t AS "Tipo de Operacion", op_r AS "Resultado de la operacion", est_time AS "Tiempo Restante Maximo";
