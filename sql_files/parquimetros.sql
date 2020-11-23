@@ -39,7 +39,7 @@ CREATE TABLE tipos_tarjeta(
 )ENGINE=InnoDB;
 CREATE TABLE tarjetas(
 	id_tarjeta SMALLINT unsigned NOT NULL AUTO_INCREMENT,
-	saldo DECIMAL(5,2) NOT NULL,
+	saldo DECIMAL(5,2) UNIQUE NOT NULL,
 	tipo VARCHAR(45) NOT NULL,
 	patente VARCHAR(6) NOT NULL,
 	CONSTRAINT pk_tarjetas
@@ -173,45 +173,63 @@ CREATE TABLE ventas(
 		
 	CONSTRAINT fk_ventas_tipos
 	FOREIGN KEY (tipo_tarjeta) REFERENCES tarjetas (tipo)
-		ON DELETE RESTRICT ON UPDATE CASCADE
+		ON DELETE RESTRICT ON UPDATE CASCADE,
 		
 	CONSTRAINT fk_ventas_saldo
 	FOREIGN KEY (saldo) REFERENCES tarjetas (saldo)
 		ON DELETE RESTRICT ON UPDATE CASCADE
+		
 )ENGINE=InnoDB;
+
 #-------------------------------------------------------------------------------------------------------------------------------------
 delimiter !
 CREATE PROCEDURE conectar(IN id_tarjeta INTEGER , IN id_parq INTEGER)
 begin
-	START TRANSACTION;
 	DECLARE op_t VARCHAR(8);
 	DECLARE op_r VARCHAR(4);
 	DECLARE est_time INTEGER;
 	DECLARE operacion BOOLEAN;
+	DECLARE sal INTEGER;
+	DECLARE descuento INTEGER;
+	DECLARE tarifa INTEGER;
+	DECLARE hora_ini TIME;
+	DECLARE hora_fin TIME;
+	DECLARE fecha_ini DATE;
+	DECLARE fecha_fin DATE;
+	
+	START TRANSACTION;
 	SELECT true INTO operacion FROM tarjetas AS t NATURAL JOIN estacionamientos AS e
-							   WHERE t.id_tarjeta = id_tarjeta AND e.fecha_sal != NULL;
-
+							   WHERE t.id_tarjeta = id_tarjeta AND e.fecha_sal IS NOT NULL;
+	SELECT t.saldo INTO sal FROM tarjetas AS t WHERE t.id_tarjeta = id_tarjeta;
+	SELECT tt.descuento INTO descuento FROM tarjetas NATURAL JOIN tipos_tarjeta AS tt WHERE t.id_tarjeta = id_tarjeta;
+	SELECT u.tarifa INTO tarifa FROM parquimetro AS p NATURAL JOIN ubicaciones AS u
+									WHERE p.calle = u.calle AND p.altura = u.altura;
+	SELECT t.saldo INTO sal FROM tarjetas AS t WHERE t.id_tarjeta = id_tarjeta;
+	SELECT tt.descuento INTO descuento FROM tarjetas NATURAL JOIN tipos_tarjeta AS tt WHERE t.id_tarjeta = id_tarjeta;
+			
 	IF operacion THEN
-		DECLARE sal INTEGER;
-		DECLARE descuento INTEGER
-		DECLARE tarifa INTEGER  
+		
 		SET op_t="apertura";
 
 		SELECT true INTO operacion FROM tarjetas AS t WHERE t.id_tarjeta = id_tarjeta AND t.saldo > 0;
-		SELECT u.tarifa INTO tarifa FROM parquimetro AS p NATURAL JOIN ubicaciones AS u
-									WHERE p.calle = u.calle AND p.altura = u.altura;
-		SELECT t.saldo INTO sal FROM tarjetas AS t WHERE t.id_tarjeta = id_tarjeta;
-		SELECT tt.descuento INTO descuento FROM tarjetas NATURAL JOIN tipos_tarjeta AS tt WHERE t.id_tarjeta = id_tarjeta;
 		IF operacion THEN
 			SET op_r = "Ok";
 			SET est_time = (sal/(tarifa*(1-descuento))); 
-			INSERT estacionamientos	
+			INSERT INTO estacionamientos(id_tarjeta,id_parq,fecha_ent,hora_ent) VALUES(id_tarjeta,id_parq,curdate(),curtime());
 		ELSE
 			SET op_r = "Fail";
 		END IF;
 	ELSE
 		SET op_t="cierre";
-		SET op_r="Ok";
+		
+		SET fecha_fin = curdate();
+		SET hora_fin = curtime();
+		SELECT t.fecha_ent INTO fecha_ini FROM tarjetas AS t WHERE id_tarjeta=t.id_tarjeta;
+		SELECT t.hora_ent INTO hora_ini FROM tarjetas AS t WHERE id_tarjeta=t.id_tarjeta; #update no insert
+		INSERT INTO estacionamientos VALUES(id_tarjeta,id_parq,fecha_ini,hora_ini,fecha_fin,hora_fin);
+		SET est_time = ((fecha_fin+0)-(fecha_ini+0)*1440) + (((hora_fin+0)-(hora_ini+0)+24)%24);
+		SET sal = sal-((tarifa*(1-descuento))*ROUND(est_time/60));
+		#UPDATE saldo de la tarjetas
 	END IF;
 
 	SELECT op_t AS "Tipo de Operacion", op_r AS "Resultado de la operacion", est_time AS "Tiempo Restante Maximo";
@@ -237,6 +255,14 @@ GRANT ALL PRIVILEGES ON parquimetros.* TO 'admin'@'localhost' WITH GRANT OPTION;
 CREATE USER 'venta'@'%' IDENTIFIED BY 'venta';
 
 GRANT INSERT ON parquimetros.tarjetas TO 'venta'@'%';
+
+CREATE USER 'parquimetro' IDENTIFIED BY 'parq';
+
+GRANT EXECUTE ON PROCEDURE parquimetros.conectar TO 'parquimetro'@'%';
+
+GRANT UPDATE ON parquimetro.estacionamientos TO 'parquimetro'@'%';
+
+GRANT UPDATE ON parquimetro.tarjetas TO 'parquimetro'@'%';
 
 CREATE USER 'inspector'@'%' IDENTIFIED BY 'inspector';
 
