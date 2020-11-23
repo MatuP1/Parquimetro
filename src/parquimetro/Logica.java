@@ -16,6 +16,7 @@ public class Logica {
 	private String error = null;
 	private Connection cnx=null;
 	private DBTable tabla = null;
+	private String parq_pass="Parq";
 	public Logica() {}
 	public DBTable connectAdmin(String pass) {
 		tabla = new DBTable();
@@ -83,6 +84,56 @@ public class Logica {
 	       }
 	    }
 		return tabla;
+	}
+	
+	public DBTable connectParquimetro() {
+		tabla = new DBTable();
+
+		if (this.cnx == null)
+	    {       
+	       try
+	       {
+	    	  String driver ="com.mysql.cj.jdbc.Driver";
+	    	  String servidor = "localhost:3306";
+	          String baseDatos = "parquimetros";
+	          String usuario = "parquimetro";
+	          String clave = parq_pass;
+	          String uri = "jdbc:mysql://" + servidor + "/" + baseDatos + 
+	          		          "?serverTimezone=America/Argentina/Buenos_Aires";
+	       
+	          cnx = DriverManager.getConnection(uri, usuario, clave);
+	         try {
+				tabla.connectDatabase(driver, uri, usuario, clave);
+			} catch (ClassNotFoundException e) {
+				
+				e.printStackTrace();
+			}
+	       }
+	       catch (SQLException ex)
+	       {
+	    	  error = ex.getMessage();
+	          System.out.println("SQLException: " + ex.getMessage());
+	          System.out.println("SQLState: " + ex.getSQLState());
+	          System.out.println("VendorError: " + ex.getErrorCode());
+	       }
+	    }
+		return tabla;
+	}
+	
+	public ResultSet conexion_parq(int id_t,int id_p) { //PUEDE FALLAR DIRIA TUSAM
+		ResultSet rs = null;
+		try {
+			if(cnx.isValid(1000)) {
+				String sql="call conectar("+id_t+","+id_p+");";
+	 			Statement st=cnx.createStatement();
+	 		    rs=st.executeQuery(sql);
+			}
+		} catch (SQLException e) {
+			System.out.println("Se agoto el tiempo de espera para la conexion");
+			e.printStackTrace();
+		}
+		
+		return rs;	
 	}
 	
 	public String getError() {
