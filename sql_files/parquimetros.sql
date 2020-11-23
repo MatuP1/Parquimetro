@@ -197,11 +197,11 @@ begin
 	START TRANSACTION;
 	SELECT true INTO operacion FROM tarjetas AS t NATURAL JOIN estacionamientos AS e WHERE t.id_tarjeta = id_t AND e.fecha_sal IS NOT NULL;
 	SELECT t.saldo INTO sal FROM tarjetas AS t WHERE t.id_tarjeta = id_t;
-	SELECT tt.descuento INTO descuento FROM tarjetas NATURAL JOIN tipos_tarjeta AS tt WHERE t.id_tarjeta = id_t;
+	SELECT tt.descuento INTO descuento FROM tarjetas AS t NATURAL JOIN tipos_tarjeta AS tt WHERE t.id_tarjeta = id_t;
 	SELECT u.tarifa INTO tarifa FROM parquimetro AS p NATURAL JOIN ubicaciones AS u
 									WHERE p.calle = u.calle AND p.altura = u.altura;
 	SELECT t.saldo INTO sal FROM tarjetas AS t WHERE t.id_tarjeta = id_t;
-	SELECT tt.descuento INTO descuento FROM tarjetas NATURAL JOIN tipos_tarjeta AS tt WHERE t.id_tarjeta = id_t;
+	SELECT tt.descuento INTO descuento FROM tarjetas AS t NATURAL JOIN tipos_tarjeta AS tt WHERE t.id_tarjeta = id_t;
 			
 	IF operacion THEN
 		
@@ -220,9 +220,9 @@ begin
 		
 		SET fecha_fin = curdate();
 		SET hora_fin = curtime();
-		SELECT t.fecha_ent INTO fecha_ini FROM tarjetas AS t WHERE id_tarjeta=t.id_t;
-		SELECT t.hora_ent INTO hora_ini FROM tarjetas AS t WHERE id_tarjeta=t.id_t; #update no insert
-		INSERT INTO estacionamientos VALUES(id_t,id_p,fecha_ini,hora_ini,fecha_fin,hora_fin);
+		SELECT t.fecha_ent INTO fecha_ini FROM tarjetas AS t WHERE t.id_tarjeta=id_t;
+		SELECT t.hora_ent INTO hora_ini FROM tarjetas AS t WHERE t.id_tarjeta=id_t; 
+		UPDATE INTO estacionamientos VALUES(id_t,id_p,fecha_ini,hora_ini,fecha_fin,hora_fin);
 		SET est_time = ((fecha_fin+0)-(fecha_ini+0)*1440) + (((hora_fin+0)-(hora_ini+0)+24)%24);
 		SET sal = sal-((tarifa*(1-descuento))*ROUND(est_time/60));
 		#UPDATE saldo de la tarjetas
