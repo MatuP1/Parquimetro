@@ -178,6 +178,16 @@ CREATE TABLE ventas(
 		
 )ENGINE=InnoDB;
 
+delimiter !
+CREATE TRIGGER venta_tarjeta
+AFTER INSERT ON tarjetas
+FOR EACH ROW
+BEGIN
+	INSERT INTO ventas (id_tarjeta,tipo_tarjeta,saldo,fecha,hora)
+	VALUES (NEW.id_tarjeta,NEW.tipo,NEW.saldo,curdate(),curtime());
+END; !
+delimiter ;
+
 #-------------------------------------------------------------------------------------------------------------------------------------
 delimiter !
 CREATE PROCEDURE conectar(IN id_t INTEGER , IN id_p INTEGER)
@@ -193,7 +203,19 @@ begin
 	DECLARE hora_fin TIME;
 	DECLARE fecha_ini DATE;
 	DECLARE fecha_fin DATE;
-	
+	DECLARE codigo_SQL CHAR(5) DEFAULT '00000';
+	DECLARE codigo_MYSQL INT DEFAULT 0;
+	DECLARE mensaje_error TEXT;
+	DECLARE EXIT HANDLER FOR SQLEXCEPTION
+	BEGIN
+		GET DIAGNOSTICS CONDITION 1 codigo_MYSQL= MYSQL_ERRNO,
+		codigo_SQL= RETURNED_SQLSTATE,
+		mensaje_error= MESSAGE_TEXT;
+		SELECT 'SQLEXCEPTION!, transacción abortada' AS resultado,
+		codigo_MySQL, codigo_SQL, mensaje_error;
+		ROLLBACK;
+	END;
+
 	START TRANSACTION;
 	SELECT true INTO operacion FROM tarjetas AS t NATURAL JOIN estacionamientos AS e 
 			WHERE t.id_tarjeta = id_t AND e.fecha_sal IS NULL;
@@ -233,6 +255,7 @@ begin
         AS discounted
 			SET saldo = sal
 			WHERE tarjetas.id_tarjeta= discounted.id_tarjeta;
+		SELECT op_t AS "Tipo de Operacion",  est_time AS "Tiempo Estacionado", sal AS "Saldo restante";
 	ELSE		
 		SET op_t="apertura";
 		SET operacion = false;
@@ -241,13 +264,12 @@ begin
 			SET op_r = "Ok";
 			SET est_time = (sal/(tarifa*(1-descuento))); 
 			INSERT INTO estacionamientos(id_tarjeta,id_parq,fecha_ent,hora_ent) VALUES(id_t,id_p,curdate(),curtime());
-		#posible rollback por mas de un estacionamieto abierot
+			SELECT op_t AS "Tipo de Operacion", op_r AS "Resultado de la operacion", est_time AS "Tiempo Restante Maximo";
+	#posible rollback por mas de un estacionamieto abierot
 		ELSE
 			SET op_r = "Fail";
 		END IF;	
 	END IF;
-
-	SELECT op_t AS "Tipo de Operacion", op_r AS "Resultado de la operacion", est_time AS "Tiempo Restante Maximo";
 	COMMIT;
 end; !
 delimiter ;
