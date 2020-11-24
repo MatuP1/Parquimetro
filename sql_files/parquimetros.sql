@@ -207,32 +207,16 @@ begin
 		SET op_r = "Ok";
 		SET fecha_fin = curdate();
 		SET hora_fin = curtime();
-		SELECT e.fecha_ent INTO fecha_ini FROM estacionamientos AS e WHERE e.id_tarjeta=id_t AND e.id_parq = id_p AND e.fecha_sal IS NULL;
-		SELECT e.hora_ent INTO hora_ini FROM estacionamientos AS e WHERE e.id_tarjeta=id_t AND e.id_parq = id_p AND e.fecha_sal IS NULL; 
-		#UPDATE estacionamientos SET fecha_sal = fecha_fin WHERE id_tarjeta IN (SELECT t.id_tarjeta FROM tarjetas AS t NATURAL JOIN parquimetros AS p WHERE t.id_tarjeta = id_t AND p.id_parq=id_p AND fecha_sal IS NULL);
-		UPDATE /*+ NO_MERGE(discounted) */ estacionamientos,
-       (SELECT id_tarjeta,id_parq,fecha_sal FROM estacionamientos AS e WHERE e.id_tarjeta=id_t AND e.id_parq = id_p AND e.fecha_sal IS NULL)
-        AS discounted
-			SET estacionamientos.fecha_sal = fecha_fin
-			WHERE estacionamientos.id_tarjeta=discounted.id_tarjeta AND estacionamientos.id_parq = discounted.id_parq AND discounted.fecha_sal IS NULL;
-		UPDATE /*+ NO_MERGE(discounted) */ estacionamientos,
-       (SELECT id_tarjeta,id_parq,hora_sal FROM estacionamientos AS e WHERE e.id_tarjeta=id_t AND e.id_parq = id_p AND e.hora_sal IS NULL)
-        AS discounted
-			SET estacionamientos.hora_sal = hora_fin
-			WHERE estacionamientos.id_tarjeta=discounted.id_tarjeta AND estacionamientos.id_parq = discounted.id_parq AND discounted.hora_sal IS NULL;
-		#UPDATE estacionamientos SET hora_sal = hora_fin WHERE id_tarjeta IN (SELECT e.id_tarjeta FROM estacionamientos AS e WHERE e.id_tarjeta = id_t AND e.id_parq=id_p AND e.fecha_sal IS NULL);
-		SET est_time = (((fecha_fin+0)-(fecha_ini+0))*1440) + ((((hora_fin+0)-(hora_ini+0)+24)%24)*60);
+		SELECT e.fecha_ent INTO fecha_ini FROM estacionamientos AS e WHERE e.id_tarjeta=id_t AND e.id_parq = id_p;
+		SELECT e.hora_ent INTO hora_ini FROM estacionamientos AS e WHERE e.id_tarjeta=id_t AND e.id_parq = id_p; 
+		UPDATE estacionamientos SET fecha_sal = fecha_fin;
+		UPDATE estacionamientos SET hora_sal = hora_fin;
+		SET est_time = ((fecha_fin+0)-(fecha_ini+0)*1440) + (((hora_fin+0)-(hora_ini+0)+24)%24);
 		SET sal = sal-((tarifa*(1-descuento))*ROUND(est_time/60));
 		IF sal IS NULL OR sal<(-999)THEN
 			SET sal = -900;
 		END IF;
-		#UPDATE tarjetas SET saldo = sal WHERE id_tarjeta IN (SELECT t.id_tarjeta FROM tarjetas AS t WHERE t.id_tarjeta = id_t);
-		UPDATE /*+ NO_MERGE(discounted) */ tarjetas,
-       (SELECT id_tarjeta FROM tarjetas AS t
-        WHERE t.id_tarjeta=id_t)
-        AS discounted
-			SET saldo = sal
-			WHERE tarjetas.id_tarjeta= discounted.id_tarjeta;
+		UPDATE tarjetas SET saldo = sal;
 	ELSE		
 		SET op_t="apertura";
 		SET operacion = false;
