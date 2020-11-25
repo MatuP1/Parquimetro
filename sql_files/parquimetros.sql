@@ -243,8 +243,9 @@ begin
 			SET estacionamientos.hora_sal = hora_fin
 			WHERE estacionamientos.id_tarjeta=discounted.id_tarjeta AND estacionamientos.id_parq = discounted.id_parq AND discounted.hora_sal IS NULL;
 		#UPDATE estacionamientos SET hora_sal = hora_fin WHERE id_tarjeta IN (SELECT e.id_tarjeta FROM estacionamientos AS e WHERE e.id_tarjeta = id_t AND e.id_parq=id_p AND e.fecha_sal IS NULL);
-		SET est_time = (((fecha_fin+0)-(fecha_ini+0))*1440) + ((((hora_fin+0)-(hora_ini+0)+24)%24)*60);
-		SET sal = sal-((tarifa*(1-descuento))*ROUND(est_time/60));
+		#SET est_time = (((fecha_fin+0)-(fecha_ini+0))*1440) + ((((hora_fin+0)-(hora_ini+0)+24)%24)*60);
+		SET est_time = TIMESTAMPDIFF(MINUTE,TIMESTAMP(fecha_ini,hora_ini),NOW());
+		SET sal = sal-((tarifa*(1-descuento))*(est_time));
 		IF sal IS NULL OR sal<(-999)THEN
 			SET sal = -900;
 		END IF;
