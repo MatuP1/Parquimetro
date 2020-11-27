@@ -197,16 +197,14 @@ begin
 	DECLARE est_time INTEGER;
 	DECLARE operacion BOOLEAN DEFAULT false;
 	DECLARE sal INTEGER DEFAULT 0;
-	DECLARE descuento DECIMAL(3,2); /*DECIMAL(3,2) */
+	DECLARE descuento DECIMAL(3,2);
 	DECLARE tarifa INTEGER;
 	DECLARE hora_ini TIME;
 	DECLARE hora_fin TIME;
 	DECLARE fecha_ini DATE;
 	DECLARE fecha_fin DATE;
 	DECLARE calle VARCHAR(45);
-	DECLARE altura SMALLINT;  /* creo que habria que agregar 'unsigned NOT NULL ' */
-	/*DECLARE calle_og VARCHAR(45);
-	DECLARE altura_og SMALLINT;*/
+	DECLARE altura SMALLINT;
 	DECLARE codigo_SQL CHAR(5) DEFAULT '00000';
 	DECLARE codigo_MYSQL INT DEFAULT 0;
 	DECLARE mensaje_error TEXT;
@@ -219,29 +217,29 @@ begin
 		codigo_MySQL, codigo_SQL, mensaje_error;
 		ROLLBACK;
 	END;
+	IF NOT EXISTS (SELECT * FROM tarjetas AS t WHERE t.id_tarjeta=id_t)THEN
+		SIGNAL SQLSTATE '45000'
+		SET MESSAGE_TEXT = 'La tarjeta no pertenecen a la base de datos';
+	END if;
+	
+	IF NOT EXISTS (SELECT * FROM parquimetros AS p WHERE p.id_parq=id_p) THEN
+		SIGNAL SQLSTATE '45000'
+		SET MESSAGE_TEXT = 'El parquimetro no pertenecen a la base de datos';
+	END if;
 
 	START TRANSACTION;
 	SELECT true INTO operacion FROM tarjetas AS t NATURAL JOIN estacionamientos AS e 
 			WHERE t.id_tarjeta = id_t AND e.fecha_sal IS NULL;
 	SELECT t.saldo INTO sal FROM tarjetas AS t WHERE t.id_tarjeta = id_t;
-	SELECT u.tarifa INTO tarifa FROM parquimetros AS p NATURAL JOIN estacionamientos as e NATURAL JOIN ubicaciones as u 
-			WHERE e.id_tarjeta=id_t AND e.fecha_sal IS NULL AND hora_sal IS NULL; /* CON ESTA LINEA AGARRAMOS LA TARIFA DEL LUGAR DONDE ESTACIONO */
-	/*SELECT u.tarifa INTO tarifa FROM parquimetros AS p NATURAL JOIN ubicaciones AS u 
-			WHERE p.id_parq = id_p AND p.calle = u.calle AND p.altura = u.altura;*/
 	SELECT tt.descuento INTO descuento FROM tarjetas AS t NATURAL JOIN tipos_tarjeta AS tt 
 			WHERE t.id_tarjeta = id_t;
 
 	IF operacion THEN
+		SELECT u.tarifa INTO tarifa FROM parquimetros AS p NATURAL JOIN estacionamientos as e NATURAL JOIN ubicaciones as u /* CON ESTA LINEA AGARRAMOS LA TARIFA DEL LUGAR DONDE ESTACIONO */
+				WHERE e.id_tarjeta=id_t AND e.fecha_sal IS NULL AND hora_sal IS NULL; 
 		SET op_t="cierre";
 		SET fecha_fin = curdate();
 		SET hora_fin = curtime();
-		/*SELECT p.calle, p.altura INTO calle_og,altura_og FROM estacionamientos AS e NATURAL JOIN parquimetros AS p
-			WHERE e.id_tarjeta = id_t AND e.fecha_sal IS NULL;
-		SELECT p.calle, p.altura INTO calle,altura FROM parquimetros AS p WHERE p.id_parq = id_p;
-		IF calle<>calle_og OR altura<>altura_og THEN
-			SIGNAL SQLSTATE '45000'
-			SET MESSAGE_TEXT = 'El parquimetro de cierre no esta en la misma cuadra';
-		END if;*/
 		SELECT e.fecha_ent INTO fecha_ini FROM estacionamientos AS e NATURAL JOIN parquimetros AS p
 			WHERE e.id_tarjeta=id_t AND e.fecha_sal IS NULL;
 		SELECT e.hora_ent INTO hora_ini FROM estacionamientos AS e 
@@ -273,11 +271,13 @@ begin
 			SET saldo = sal
 			WHERE tarjetas.id_tarjeta= discounted.id_tarjeta;
 		SELECT op_t AS "Tipo de Operacion",  est_time AS "Tiempo Estacionado", sal AS "Saldo restante";
-	ELSE		
+	ELSE
+		SELECT u.tarifa INTO tarifa FROM parquimetros AS p NATURAL JOIN ubicaciones AS u /*CON ESTA LINEA AGARRO LA TARIFA DEL LUGAR DONDE VOY A ESTACIONAR*/
+				WHERE p.id_parq = id_p;	
 		SET op_t="apertura";
 		SET operacion = false;
 		SELECT true INTO operacion FROM tarjetas AS t WHERE t.id_tarjeta = id_t AND t.saldo > 0;
-		IF operacion THEN
+		IF operacion THEN 
 			SET op_r = "Ok";
 			SET est_time = (sal/(tarifa*(1-descuento))); 
 			INSERT INTO estacionamientos(id_tarjeta,id_parq,fecha_ent,hora_ent) VALUES(id_t,id_p,curdate(),curtime());
