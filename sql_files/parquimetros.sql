@@ -203,6 +203,10 @@ begin
 	DECLARE hora_fin TIME;
 	DECLARE fecha_ini DATE;
 	DECLARE fecha_fin DATE;
+	DECLARE calle VARCHAR(45);
+	DECLARE altura SMALLINT;
+	DECLARE calle_og VARCHAR(45);
+	DECLARE altura_og SMALLINT;
 	DECLARE codigo_SQL CHAR(5) DEFAULT '00000';
 	DECLARE codigo_MYSQL INT DEFAULT 0;
 	DECLARE mensaje_error TEXT;
@@ -211,7 +215,7 @@ begin
 		GET DIAGNOSTICS CONDITION 1 codigo_MYSQL= MYSQL_ERRNO,
 		codigo_SQL= RETURNED_SQLSTATE,
 		mensaje_error= MESSAGE_TEXT;
-		SELECT 'SQLEXCEPTION!, transacción abortada' AS resultado,
+		SELECT 'SQLEXCEPTION!, transaccion abortada' AS resultado,
 		codigo_MySQL, codigo_SQL, mensaje_error;
 		ROLLBACK;
 	END;
@@ -224,30 +228,40 @@ begin
 			WHERE p.id_parq = id_p AND p.calle = u.calle AND p.altura = u.altura;
 	SELECT tt.descuento INTO descuento FROM tarjetas AS t NATURAL JOIN tipos_tarjeta AS tt 
 			WHERE t.id_tarjeta = id_t;
+
 	IF operacion THEN
 		SET op_t="cierre";
-		SET op_r = "Ok";
 		SET fecha_fin = curdate();
 		SET hora_fin = curtime();
-		SELECT e.fecha_ent INTO fecha_ini FROM estacionamientos AS e WHERE e.id_tarjeta=id_t AND e.id_parq = id_p AND e.fecha_sal IS NULL;
-		SELECT e.hora_ent INTO hora_ini FROM estacionamientos AS e WHERE e.id_tarjeta=id_t AND e.id_parq = id_p AND e.fecha_sal IS NULL; 
+		SELECT p.calle, p.altura INTO calle_og,altura_og FROM estacionamientos AS e NATURAL JOIN parquimetros AS p
+			WHERE e.id_tarjeta = id_t AND e.fecha_sal IS NULL;
+		SELECT p.calle, p.altura INTO calle,altura FROM parquimetros AS p WHERE p.id_parq = id_p;
+		IF calle<>calle_og OR altura<>altura_og THEN
+			SIGNAL SQLSTATE '45000'
+			SET MESSAGE_TEXT = 'El parquimetro de cierre no esta en la misma cuadra';
+		END if;
+		SELECT e.fecha_ent INTO fecha_ini FROM estacionamientos AS e NATURAL JOIN parquimetros AS p
+			WHERE e.id_tarjeta=id_t AND e.fecha_sal IS NULL;
+		SELECT e.hora_ent INTO hora_ini FROM estacionamientos AS e 
+			WHERE e.id_tarjeta=id_t AND e.fecha_sal IS NULL; 
+		
 		#UPDATE estacionamientos SET fecha_sal = fecha_fin WHERE id_tarjeta IN (SELECT t.id_tarjeta FROM tarjetas AS t NATURAL JOIN parquimetros AS p WHERE t.id_tarjeta = id_t AND p.id_parq=id_p AND fecha_sal IS NULL);
 		UPDATE /*+ NO_MERGE(discounted) */ estacionamientos,
-       (SELECT id_tarjeta,id_parq,fecha_sal FROM estacionamientos AS e WHERE e.id_tarjeta=id_t AND e.id_parq = id_p AND e.fecha_sal IS NULL)
+       (SELECT id_tarjeta,fecha_sal FROM estacionamientos AS e WHERE e.id_tarjeta=id_t AND e.fecha_sal IS NULL)
         AS discounted
 			SET estacionamientos.fecha_sal = fecha_fin
-			WHERE estacionamientos.id_tarjeta=discounted.id_tarjeta AND estacionamientos.id_parq = discounted.id_parq AND discounted.fecha_sal IS NULL;
+			WHERE estacionamientos.id_tarjeta=discounted.id_tarjeta AND discounted.fecha_sal IS NULL;
 		UPDATE /*+ NO_MERGE(discounted) */ estacionamientos,
-       (SELECT id_tarjeta,id_parq,hora_sal FROM estacionamientos AS e WHERE e.id_tarjeta=id_t AND e.id_parq = id_p AND e.hora_sal IS NULL)
+       (SELECT id_tarjeta,hora_sal FROM estacionamientos AS e WHERE e.id_tarjeta=id_t AND e.hora_sal IS NULL)
         AS discounted
 			SET estacionamientos.hora_sal = hora_fin
-			WHERE estacionamientos.id_tarjeta=discounted.id_tarjeta AND estacionamientos.id_parq = discounted.id_parq AND discounted.hora_sal IS NULL;
+			WHERE estacionamientos.id_tarjeta=discounted.id_tarjeta AND discounted.hora_sal IS NULL;
 		#UPDATE estacionamientos SET hora_sal = hora_fin WHERE id_tarjeta IN (SELECT e.id_tarjeta FROM estacionamientos AS e WHERE e.id_tarjeta = id_t AND e.id_parq=id_p AND e.fecha_sal IS NULL);
 		#SET est_time = (((fecha_fin+0)-(fecha_ini+0))*1440) + ((((hora_fin+0)-(hora_ini+0)+24)%24)*60);
 		SET est_time = TIMESTAMPDIFF(MINUTE,TIMESTAMP(fecha_ini,hora_ini),NOW());
 		SET sal = sal-((tarifa*(1-descuento))*(est_time));
 		IF sal IS NULL OR sal<(-999)THEN
-			SET sal = -900;
+			SET sal = -999;
 		END IF;
 		#UPDATE tarjetas SET saldo = sal WHERE id_tarjeta IN (SELECT t.id_tarjeta FROM tarjetas AS t WHERE t.id_tarjeta = id_t);
 		UPDATE /*+ NO_MERGE(discounted) */ tarjetas,
