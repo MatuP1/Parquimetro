@@ -46,7 +46,10 @@ public class PanelIngresoUsuario extends javax.swing.JInternalFrame{
 		Alto = v.getAlto();
 		logica = vPrincipal.getLogica();
 		
-		this.setBounds(0, 0, Ancho, Alto);
+		logica.connectParquimetro();
+		
+		//this.setBounds(0, 0, Ancho, Alto);
+		this.setBounds(0, 0, 800, 800);
         setVisible(true);
         this.setTitle("Ingreso Usuario");
         this.setClosable(false);
@@ -74,9 +77,19 @@ public class PanelIngresoUsuario extends javax.swing.JInternalFrame{
  		getContentPane().add(scrollPaneTarjetas);
  		
  		JButton btnIngreso = new JButton("Ingresar/Salir de Estacionamiento");
- 		btnIngreso.setBounds(289, 566, 199, 55);
+ 		btnIngreso.setBounds(479, 565, 199, 55);
  		btnIngreso.setEnabled(false);
  		getContentPane().add(btnIngreso);
+ 		
+ 		JButton btnBack = new JButton("Volver al Inicio");
+ 		btnBack.setBounds(111, 565, 199, 55);
+ 		btnBack.addActionListener(new ActionListener() {
+            public void actionPerformed(ActionEvent evt) {
+               vPrincipal.volverPanelInicial();
+            }
+         });
+ 		getContentPane().add(btnBack);
+ 		
  		
  		JLabel lblNewLabel_1 = new JLabel("Parquimetros");
  		lblNewLabel_1.setFont(new Font("Tahoma", Font.PLAIN, 14));
@@ -98,10 +111,11 @@ public class PanelIngresoUsuario extends javax.swing.JInternalFrame{
  		
      	
  		try {
- 			String sql="Select * from ubicaciones"; //HAY QUE CHECKEAR SI ESTA BIEN
+ 			String sql="Select * from ubicaciones"; 
  			Statement st=logica.getConnection().createStatement();
  			ResultSet rs=st.executeQuery(sql);
  			table_ubicaciones.refresh(rs);
+ 			
  		}
  		catch (SQLException e1) {
 				// en caso de error, se muestra la causa en la consola
@@ -123,7 +137,7 @@ public class PanelIngresoUsuario extends javax.swing.JInternalFrame{
 				int fila = table_ubicaciones.getSelectedRow();
 				calle = table_ubicaciones.getValueAt(fila, 0).toString();
 				altura= table_ubicaciones.getValueAt(fila, 1).toString();
- 				String sql_parq="SELECT DISTINCT P.id_parq,P.numero,P.calle,P.altura from  ubicaciones as U NATURAL JOIN parquimetros AS P WHERE P.calle=\""+calle+"\" AND P.altura="+altura;//HAY QUE CHECKEAR SI ESTA BIEN
+ 				String sql_parq="SELECT DISTINCT P.id_parq,P.numero,P.calle,P.altura from  ubicaciones as U NATURAL JOIN parquimetros AS P WHERE P.calle=\""+calle+"\" AND P.altura="+altura;
  				try {
 				Statement st_parq = logica.getConnection().createStatement();
 				ResultSet rs_parq = st_parq.executeQuery(sql_parq);
@@ -146,7 +160,7 @@ public class PanelIngresoUsuario extends javax.swing.JInternalFrame{
  			@Override
  			public void mouseClicked(MouseEvent e) {	
  				btnIngreso.setEnabled(false);
- 				String sql_tarj="SELECT * FROM tarjetas";//HAY QUE CHECKEAR SI ESTA BIEN
+ 				String sql_tarj="SELECT * FROM tarjetas";
  				try {
 				Statement st_tarj = logica.getConnection().createStatement();
 				ResultSet rs_tarj = st_tarj.executeQuery(sql_tarj);
@@ -201,19 +215,15 @@ public class PanelIngresoUsuario extends javax.swing.JInternalFrame{
                 	String tipo_ope = table_res.getValueAt(fila_res, 0).toString();
                 	String tipo_res = table_res.getValueAt(fila_res, 1).toString();
                 	int minutos_restantes = (int)table_res.getValueAt(fila_res, 2); //Es devuelto en minutos
-                	
-                	int horas=minutos_restantes/60;
-                	int minutos=minutos_restantes-horas*60;
-                	
-                	
-                	if(tipo_ope == "apertura" && tipo_res == "Ok") {
-                		JOptionPane.showMessageDialog(null, "Se abrio con exito un estacionamiento y le quedan \""+horas+"\":\""+minutos+"\".");
-                	}else if(tipo_ope == "apertura" && tipo_res == "Fail") {
+      
+                	if(tipo_ope.equals("apertura") && tipo_res.equals("Ok")) {
+                		JOptionPane.showMessageDialog(null, "Se abrio con exito un estacionamiento y le quedan "+minutos_restantes+" minutos restantes.");
+                	}else if(tipo_ope.equals("apertura") && tipo_res.equals("Fail")) {
                 		JOptionPane.showMessageDialog(null, "No se pudo abrir un estacionamiento con dicha tarjeta");
-                	}else if(tipo_ope == "cierre" && tipo_res == "Ok") {
-                		JOptionPane.showMessageDialog(null, "Se cerro con exito un estacionamiento y estuvo estacionado \""+horas+"\":\""+minutos+"\".");
-                	}else if(tipo_ope == "cierre" && tipo_res == "Fail") {
-                		JOptionPane.showMessageDialog(null, "No se pudo cerrar un estacionamiento con dicha tarjeta");
+                	}else if(tipo_ope.equals("cierre")) {
+                		String minutos=tipo_res;
+                		int saldo=minutos_restantes;
+                		JOptionPane.showMessageDialog(null, "Se cerro con exito un estacionamiento,estuvo estacionado "+minutos+" minutos y el saldo restante es de "+saldo+" pesos.");
                 	}
         	
               }
@@ -224,9 +234,8 @@ public class PanelIngresoUsuario extends javax.swing.JInternalFrame{
 	}
 	
 	private void thisComponentShown(ComponentEvent evt) {
-	 }
+	}
 	   
-	 private void thisComponentHidden(ComponentEvent evt) {
-	    
-	 }
+    private void thisComponentHidden(ComponentEvent evt) {    
+	}
 }
