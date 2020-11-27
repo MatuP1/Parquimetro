@@ -282,9 +282,10 @@ begin
 			SET est_time = (sal/(tarifa*(1-descuento))); 
 			INSERT INTO estacionamientos(id_tarjeta,id_parq,fecha_ent,hora_ent) VALUES(id_t,id_p,curdate(),curtime());
 			SELECT op_t AS "Tipo de Operacion", op_r AS "Resultado de la operacion", est_time AS "Tiempo Restante Maximo";
-	#posible rollback por mas de un estacionamieto abierot
 		ELSE
 			SET op_r = "Fail";
+			SET est_time = 0;
+			SELECT op_t AS "Tipo de Operacion", op_r AS "Resultado de la operacion", est_time AS "Tiempo Restante Maximo";
 		END IF;	
 	END IF;
 	COMMIT;
