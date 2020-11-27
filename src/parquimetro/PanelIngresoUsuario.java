@@ -203,13 +203,12 @@ public class PanelIngresoUsuario extends javax.swing.JInternalFrame{
                 	id_tarj = (int)table_tarjetas.getValueAt(fila_tarj, 0);
                 	id_parq = (int)table_parquimetros.getValueAt(fila_parq, 0);
                 	
-                	ResultSet res = logica.conexion_parq(id_tarj, id_parq);
-                	table_res = new DBTable();
+                	
                 	try {
+                		ResultSet res = logica.conexion_parq(id_tarj, id_parq);
+                		table_res = new DBTable();
 						table_res.refresh(res);
-					} catch (SQLException e) {
-						e.printStackTrace();
-					}
+				
                 	
                 	int fila_res=table_res.getSelectedRow();
                 	String tipo_ope = table_res.getValueAt(fila_res, 0).toString();
@@ -225,6 +224,9 @@ public class PanelIngresoUsuario extends javax.swing.JInternalFrame{
                 		int saldo=minutos_restantes;
                 		JOptionPane.showMessageDialog(null, "Se cerro con exito un estacionamiento,estuvo estacionado "+minutos+" minutos y el saldo restante es de "+saldo+" pesos.");
                 	}
+                	} catch (SQLException e) {
+                		JOptionPane.showMessageDialog(null, e.getMessage().toString());
+					}
         	
               }
            });
