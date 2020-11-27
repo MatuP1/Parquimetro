@@ -120,12 +120,17 @@ public class Logica {
 		return tabla;
 	}
 	
-	public ResultSet conexion_parq(int id_t,int id_p) throws SQLException { //PUEDE FALLAR DIRIA TUSAM
+	public ResultSet conexion_parq(int id_t,int id_p) { //PUEDE FALLAR DIRIA TUSAM
 		ResultSet rs = null;
-		if(cnx.isValid(1000)) {
-			String sql="call conectar("+id_t+","+id_p+");";
-	 		Statement st=cnx.createStatement();
-	 	    rs=st.executeQuery(sql);
+		try {
+			if(cnx.isValid(1000)) {
+				String sql="call conectar("+id_t+","+id_p+");";
+	 			Statement st=cnx.createStatement();
+	 		    rs=st.executeQuery(sql);
+			}
+		} catch (SQLException e) {
+			System.out.println("Se agoto el tiempo de espera para la conexion");
+			e.printStackTrace();
 		}
 		
 		return rs;	
