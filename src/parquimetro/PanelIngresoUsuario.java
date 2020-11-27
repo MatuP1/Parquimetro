@@ -204,11 +204,14 @@ public class PanelIngresoUsuario extends javax.swing.JInternalFrame{
                 	id_parq = (int)table_parquimetros.getValueAt(fila_parq, 0);
                 	
                 	ResultSet res = logica.conexion_parq(id_tarj, id_parq);
-                	try {
+                	try {	
                 		table_res = new DBTable();
 						table_res.refresh(res);
-                	} catch (SQLException e) {
-                		e.printStackTrace();
+                	} catch (SQLException sqle) {
+                		System.out.println("Código de Error: " + sqle.getErrorCode() + "\n" +
+                				  "SLQState: " + sqle.getSQLState() + "\n" +
+                				  "Mensaje: " + sqle.getMessage() + "\n");
+                		sqle.printStackTrace();
 					}
                 	
                 	int fila_res=table_res.getSelectedRow();
