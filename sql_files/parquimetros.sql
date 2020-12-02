@@ -39,7 +39,7 @@ CREATE TABLE tipos_tarjeta(
 )ENGINE=InnoDB;
 CREATE TABLE tarjetas(
 	id_tarjeta SMALLINT unsigned NOT NULL AUTO_INCREMENT,
-	saldo DECIMAL(5,2) NOT NULL,
+	saldo DECIMAL(10,2) NOT NULL,
 	tipo VARCHAR(45) NOT NULL,
 	patente VARCHAR(6) NOT NULL,
 	CONSTRAINT pk_tarjetas
@@ -196,7 +196,7 @@ begin
 	DECLARE op_r VARCHAR(4);
 	DECLARE est_time INTEGER;
 	DECLARE operacion BOOLEAN DEFAULT false;
-	DECLARE sal INTEGER DEFAULT 0;
+	DECLARE sal DECIMAL (10,2);
 	DECLARE descuento DECIMAL(3,2);
 	DECLARE tarifa INTEGER;
 	DECLARE hora_ini TIME;
@@ -260,9 +260,9 @@ begin
 		#SET est_time = (((fecha_fin+0)-(fecha_ini+0))*1440) + ((((hora_fin+0)-(hora_ini+0)+24)%24)*60);
 		SET est_time = TIMESTAMPDIFF(MINUTE,TIMESTAMP(fecha_ini,hora_ini),NOW());
 		SET sal = sal-((tarifa*(1-descuento))*(est_time));
-		IF sal IS NULL OR sal<(-999)THEN
-			SET sal = -999;
-		END IF;
+		#IF sal IS NULL OR sal<(-999)THEN
+		#	SET sal = -999;
+		#END IF;
 		#UPDATE tarjetas SET saldo = sal WHERE id_tarjeta IN (SELECT t.id_tarjeta FROM tarjetas AS t WHERE t.id_tarjeta = id_t);
 		UPDATE /*+ NO_MERGE(discounted) */ tarjetas,
        (SELECT id_tarjeta FROM tarjetas AS t
