@@ -217,7 +217,7 @@ public class PanelIngresoUsuario extends javax.swing.JInternalFrame{
                 	int fila_res=table_res.getSelectedRow();
                 	String tipo_ope = table_res.getValueAt(fila_res, 0).toString();
                 	String tipo_res = table_res.getValueAt(fila_res, 1).toString();
-                	int minutos_restantes = (int)table_res.getValueAt(fila_res, 2); //Es devuelto en minutos
+                	String minutos_restantes = table_res.getValueAt(fila_res, 2).toString(); //Es devuelto en minutos
       
                 	if(tipo_ope.equals("apertura") && tipo_res.equals("Ok")) {
                 		JOptionPane.showMessageDialog(null, "Se abrio con exito un estacionamiento y le quedan "+minutos_restantes+" minutos restantes.");
@@ -225,7 +225,7 @@ public class PanelIngresoUsuario extends javax.swing.JInternalFrame{
                 		JOptionPane.showMessageDialog(null, "No se pudo abrir un estacionamiento con dicha tarjeta");
                 	}else if(tipo_ope.equals("cierre")) {
                 		String minutos=tipo_res;
-                		int saldo=minutos_restantes;
+                		String saldo=minutos_restantes;
                 		JOptionPane.showMessageDialog(null, "Se cerro con exito un estacionamiento,estuvo estacionado "+minutos+" minutos y el saldo restante es de "+saldo+" pesos.");
                 	}
                 	

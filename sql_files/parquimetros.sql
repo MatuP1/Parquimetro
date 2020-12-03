@@ -39,7 +39,7 @@ CREATE TABLE tipos_tarjeta(
 )ENGINE=InnoDB;
 CREATE TABLE tarjetas(
 	id_tarjeta SMALLINT unsigned NOT NULL AUTO_INCREMENT,
-	saldo DECIMAL(10,2) NOT NULL,
+	saldo DECIMAL(5,2) NOT NULL,
 	tipo VARCHAR(45) NOT NULL,
 	patente VARCHAR(6) NOT NULL,
 	CONSTRAINT pk_tarjetas
@@ -196,7 +196,7 @@ begin
 	DECLARE op_r VARCHAR(4);
 	DECLARE est_time INTEGER;
 	DECLARE operacion BOOLEAN DEFAULT false;
-	DECLARE sal DECIMAL (10,2);
+	DECLARE sal DECIMAL (11,2);
 	DECLARE descuento DECIMAL(3,2);
 	DECLARE tarifa INTEGER;
 	DECLARE hora_ini TIME;
@@ -230,7 +230,7 @@ begin
 	START TRANSACTION;
 	SELECT true INTO operacion FROM tarjetas AS t NATURAL JOIN estacionamientos AS e 
 			WHERE t.id_tarjeta = id_t AND e.fecha_sal IS NULL;
-	SELECT t.saldo INTO sal FROM tarjetas AS t WHERE t.id_tarjeta = id_t;
+	SELECT t.saldo INTO sal FROM tarjetas AS t WHERE t.id_tarjeta = id_t FOR UPDATE;
 	SELECT tt.descuento INTO descuento FROM tarjetas AS t NATURAL JOIN tipos_tarjeta AS tt 
 			WHERE t.id_tarjeta = id_t;
 
@@ -241,35 +241,25 @@ begin
 		SET fecha_fin = curdate();
 		SET hora_fin = curtime();
 		SELECT e.fecha_ent INTO fecha_ini FROM estacionamientos AS e NATURAL JOIN parquimetros AS p
-			WHERE e.id_tarjeta=id_t AND e.fecha_sal IS NULL;
+			WHERE e.id_tarjeta=id_t AND e.fecha_sal IS NULL FOR UPDATE;
 		SELECT e.hora_ent INTO hora_ini FROM estacionamientos AS e 
-			WHERE e.id_tarjeta=id_t AND e.fecha_sal IS NULL; 
+			WHERE e.id_tarjeta=id_t AND e.fecha_sal IS NULL FOR UPDATE; 
 		
-		#UPDATE estacionamientos SET fecha_sal = fecha_fin WHERE id_tarjeta IN (SELECT t.id_tarjeta FROM tarjetas AS t NATURAL JOIN parquimetros AS p WHERE t.id_tarjeta = id_t AND p.id_parq=id_p AND fecha_sal IS NULL);
-		UPDATE /*+ NO_MERGE(discounted) */ estacionamientos,
-       (SELECT id_tarjeta,fecha_sal FROM estacionamientos AS e WHERE e.id_tarjeta=id_t AND e.fecha_sal IS NULL)
-        AS discounted
-			SET estacionamientos.fecha_sal = fecha_fin
-			WHERE estacionamientos.id_tarjeta=discounted.id_tarjeta AND discounted.fecha_sal IS NULL;
-		UPDATE /*+ NO_MERGE(discounted) */ estacionamientos,
-       (SELECT id_tarjeta,hora_sal FROM estacionamientos AS e WHERE e.id_tarjeta=id_t AND e.hora_sal IS NULL)
-        AS discounted
-			SET estacionamientos.hora_sal = hora_fin
-			WHERE estacionamientos.id_tarjeta=discounted.id_tarjeta AND discounted.hora_sal IS NULL;
-		#UPDATE estacionamientos SET hora_sal = hora_fin WHERE id_tarjeta IN (SELECT e.id_tarjeta FROM estacionamientos AS e WHERE e.id_tarjeta = id_t AND e.id_parq=id_p AND e.fecha_sal IS NULL);
-		#SET est_time = (((fecha_fin+0)-(fecha_ini+0))*1440) + ((((hora_fin+0)-(hora_ini+0)+24)%24)*60);
+		UPDATE estacionamientos AS e SET e.fecha_sal = fecha_fin WHERE e.id_tarjeta=id_t AND e.fecha_sal IS NULL AND e.hora_sal IS NULL;
+		UPDATE estacionamientos AS e SET e.hora_sal = hora_fin WHERE e.id_tarjeta=id_t AND e.hora_sal IS NULL;
+		
 		SET est_time = TIMESTAMPDIFF(MINUTE,TIMESTAMP(fecha_ini,hora_ini),NOW());
 		SET sal = sal-((tarifa*(1-descuento))*(est_time));
-		#IF sal IS NULL OR sal<(-999)THEN
-		#	SET sal = -999;
-		#END IF;
-		#UPDATE tarjetas SET saldo = sal WHERE id_tarjeta IN (SELECT t.id_tarjeta FROM tarjetas AS t WHERE t.id_tarjeta = id_t);
-		UPDATE /*+ NO_MERGE(discounted) */ tarjetas,
-       (SELECT id_tarjeta FROM tarjetas AS t
-        WHERE t.id_tarjeta=id_t)
-        AS discounted
-			SET saldo = sal
-			WHERE tarjetas.id_tarjeta= discounted.id_tarjeta;
+		IF sal IS NULL OR sal<(-999)THEN
+			SET sal = -999;
+		END IF;
+		UPDATE tarjetas AS t SET t.saldo = sal WHERE t.id_tarjeta = id_t;
+		#UPDATE /*+ NO_MERGE(discounted) */ tarjetas,
+       #(SELECT id_tarjeta FROM tarjetas AS t
+       # WHERE t.id_tarjeta=id_t)
+       # AS discounted
+	#		SET saldo = sal
+#			WHERE tarjetas.id_tarjeta= discounted.id_tarjeta;
 		SELECT op_t AS "Tipo de Operacion",  est_time AS "Tiempo Estacionado", sal AS "Saldo restante";
 	ELSE
 		SELECT u.tarifa INTO tarifa FROM parquimetros AS p NATURAL JOIN ubicaciones AS u /*CON ESTA LINEA AGARRO LA TARIFA DEL LUGAR DONDE VOY A ESTACIONAR*/
